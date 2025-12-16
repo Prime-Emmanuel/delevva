@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Coupons & Rewards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--dark);
+            transition: var(--transition);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: var(--transition);
+            padding: 80px 30px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 18px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .mobile-nav-links a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 12px;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 0 60px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Coupon Input Section */
+        .coupon-input-section {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .coupon-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+        }
+
+        .coupon-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        /* Available Coupons */
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .coupons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .coupon-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid #f0f0f0;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .coupon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .coupon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+
+        .coupon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .coupon-code {
+            background: var(--light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+            border: 2px dashed var(--primary);
+        }
+
+        .coupon-discount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .coupon-discount.small {
+            font-size: 1.4rem;
+        }
+
+        .coupon-discount-type {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .coupon-description {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .coupon-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .condition-tag {
+            background: var(--light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .condition-tag i {
+            font-size: 10px;
+        }
+
+        .coupon-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .coupon-expiry {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .coupon-expiry.expiring {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .usage-count {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        /* Used Coupons */
+        .used-coupons {
+            margin-top: 40px;
+        }
+
+        .used-coupon-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--success);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .used-coupon-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .used-coupon-info p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .used-coupon-amount {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 18px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 2001;
+            max-width: 90%;
+            width: 400px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+
+        .modal-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .modal-icon.error {
+            background: rgba(238, 90, 82, 0.1);
+            color: var(--danger);
+        }
+
+        .modal-content {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .discount-amount {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 20px 0;
+            color: var(--success);
+        }
+
+        .coupon-details {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .coupon-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .coupon-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            color: var(--gray);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .coupons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+            
+            .coupons-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <div class="nav-icons">
+                    <div class="nav-icon cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge">0</span>
+                    </div>
+                    
+                    <div class="user-profile" id="userProfile">
+                        <!-- User initials will be inserted here -->
+                    </div>
+                    
+                    <div class="hamburger" id="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+            <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+            <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+            <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="vip.html"><i class="fas fa-star"></i> VIP</a></li>
+            <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+            <li><a href="blog.html"><i class="fas fa-book"></i> Blog</a></li>
+            <li><a href="partner.html"><i class="fas fa-building"></i> Partnership</a></li>
+            <li id="mobileAuthButtons">
+                <!-- Login/Logout buttons will be inserted here -->
+            </li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-header">
+            <h2>Coupon Applied! 🎉</h2>
+            <button class="modal-close" id="successModalClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 id="successTitle">Discount Applied Successfully</h3>
+            <div class="discount-amount" id="discountAmount">-15%</div>
+            <div class="coupon-details">
+                <div class="coupon-detail">
+                    <span class="detail-label">Coupon Code:</span>
+                    <span class="detail-value" id="modalCouponCode">WELCOME10</span>
+                </div>
+                <div class="coupon-detail">
+                    <span class="detail-label">Discount Type:</span>
+                    <span class="detail-value" id="modalDiscountType">Percentage</span>
+                </div>
+                <div class="coupon-detail">
+                    <span class="detail-label">Minimum Order:</span>
+                    <span class="detail-value" id="modalMinOrder">5,000 FCFA</span>
+                </div>
+                <div class="coupon-detail">
+                    <span class="detail-label">Valid Until:</span>
+                    <span class="detail-value" id="modalValidUntil">Dec 31, 2023</span>
+                </div>
+            </div>
+            <p id="successMessage">This coupon has been added to your account and will be automatically applied to your next eligible order.</p>
+            <button class="btn btn-primary" id="successModalBtn">Start Shopping</button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal" id="errorModal">
+        <div class="modal-header">
+            <h2>Unable to Apply Coupon</h2>
+            <button class="modal-close" id="errorModalClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="modal-icon error">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 id="errorTitle">Coupon Not Valid</h3>
+            <p id="errorMessage">The coupon code you entered is either invalid, expired, or has reached its usage limit.</p>
+            <button class="btn btn-primary" id="errorModalBtn">Try Another Code</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Coupons & Rewards</h1>
+                <p>Apply coupon codes to get discounts and special offers on your orders</p>
+            </div>
+
+            <!-- Coupon Input Section -->
+            <div class="coupon-input-section">
+                <div class="input-group">
+                    <input type="text" class="coupon-input" id="couponInput" placeholder="Enter coupon code (e.g., WELCOME10)" maxlength="20">
+                    <button class="btn btn-primary" id="applyCouponBtn">Apply Code</button>
+                </div>
+                <p class="input-hint">Coupon codes are case-sensitive. Enter exactly as shown.</p>
+            </div>
+
+            <!-- Available Coupons -->
+            <h2 class="section-title">Available Coupons</h2>
+            <div class="coupons-grid" id="availableCoupons">
+                <!-- Coupons will be loaded here -->
+            </div>
+
+            <!-- Used Coupons -->
+            <div class="used-coupons">
+                <h2 class="section-title">Your Used Coupons</h2>
+                <div id="usedCouponsList">
+                    <!-- Used coupons will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="services.html" class="nav-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>Deliveries</span>
+        </a>
+        <a href="coupon.html" class="nav-item active">
+            <i class="fas fa-tags"></i>
+            <span>Coupons</span>
+        </a>
+        <a href="rewards.html" class="nav-item">
+            <i class="fas fa-gift"></i>
+            <span>Rewards</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCouponPage();
+        });
+
+        async function initializeCouponPage() {
+            // Mobile menu setup
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('overlay');
+            
+            hamburger.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            overlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Modal setup
+            setupModals();
+
+            // Apply coupon button
+            document.getElementById('applyCouponBtn').addEventListener('click', applyCoupon);
+            
+            // Enter key support for coupon input
+            document.getElementById('couponInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyCoupon();
+                }
+            });
+
+            await checkAuthAndLoadData();
+        }
+
+        function setupModals() {
+            // Success modal
+            const successModal = document.getElementById('successModal');
+            const successModalClose = document.getElementById('successModalClose');
+            const successModalBtn = document.getElementById('successModalBtn');
+            
+            successModalClose.addEventListener('click', function() {
+                successModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            successModalBtn.addEventListener('click', function() {
+                successModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                window.location.href = 'services.html';
+            });
+
+            // Error modal
+            const errorModal = document.getElementById('errorModal');
+            const errorModalClose = document.getElementById('errorModalClose');
+            const errorModalBtn = document.getElementById('errorModalBtn');
+            
+            errorModalClose.addEventListener('click', function() {
+                errorModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            errorModalBtn.addEventListener('click', function() {
+                errorModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                document.getElementById('couponInput').focus();
+            });
+        }
+
+        async function checkAuthAndLoadData() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                // Update mobile menu with login/register buttons
+                const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+                mobileAuthButtons.innerHTML = `
+                    <li><a href="index.html" class="btn btn-secondary" style="display: block; text-align: center; margin: 10px 0;">Login</a></li>
+                    <li><a href="index.html" class="btn btn-primary" style="display: block; text-align: center; margin: 10px 0;">Register</a></li>
+                `;
+                
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Set user info
+            document.getElementById('userProfile').textContent = user.name.charAt(0).toUpperCase();
+
+            // Update mobile menu with logout button
+            const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+            mobileAuthButtons.innerHTML = `
+                <li><a href="#" id="logoutBtn" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            `;
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('delevva_user');
+                window.location.href = 'index.html';
+            });
+
+            // Load coupons data
+            await Promise.all([
+                loadAvailableCoupons(),
+                loadUsedCoupons(user.id)
+            ]);
+        }
+
+        async function loadAvailableCoupons() {
+            try {
+                const { data: coupons, error } = await supabaseClient
+                    .from('coupons')
+                    .select('*')
+                    .eq('is_active', true)
+                    .gte('valid_until', new Date().toISOString())
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displayAvailableCoupons(coupons || []);
+                
+            } catch (error) {
+                console.error('Error loading coupons:', error);
+                showNotification('Error loading coupons. Please try again.', 'error');
+            }
+        }
+
+        function displayAvailableCoupons(coupons) {
+            const container = document.getElementById('availableCoupons');
+            
+            if (coupons.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tags"></i>
+                        <h3>No Coupons Available</h3>
+                        <p>Check back later for new coupon offers and promotions.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = coupons.map(coupon => {
+                const discountDisplay = getDiscountDisplay(coupon);
+                const isExpiringSoon = isCouponExpiringSoon(coupon.valid_until);
+                const usagePercentage = coupon.usage_limit ? Math.round((coupon.used_count / coupon.usage_limit) * 100) : 0;
+                
+                return `
+                    <div class="coupon-card" data-coupon-id="${coupon.id}">
+                        <div class="coupon-header">
+                            <div class="coupon-code">${coupon.code}</div>
+                            <div class="coupon-discount ${discountDisplay.isSmall ? 'small' : ''}">
+                                ${discountDisplay.value}
+                                ${discountDisplay.type ? `<div class="coupon-discount-type">${discountDisplay.type}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="coupon-description">
+                            ${coupon.description || 'Special discount offer'}
+                        </div>
+                        <div class="coupon-conditions">
+                            ${coupon.min_order_amount > 0 ? `
+                                <div class="condition-tag">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Min: ${formatCurrency(coupon.min_order_amount)}
+                                </div>
+                            ` : ''}
+                            ${coupon.applicable_categories && coupon.applicable_categories.length > 0 ? `
+                                <div class="condition-tag">
+                                    <i class="fas fa-tag"></i>
+                                    ${coupon.applicable_categories.join(', ')}
+                                </div>
+                            ` : ''}
+                            ${coupon.usage_limit ? `
+                                <div class="condition-tag">
+                                    <i class="fas fa-users"></i>
+                                    Limited offer
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="coupon-footer">
+                            <div class="coupon-expiry ${isExpiringSoon ? 'expiring' : ''}">
+                                <i class="fas fa-clock"></i>
+                                Valid until: ${new Date(coupon.valid_until).toLocaleDateString()}
+                            </div>
+                            ${coupon.usage_limit ? `
+                                <div class="usage-count">
+                                    ${coupon.used_count}/${coupon.usage_limit} used
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Add click event to coupon cards
+            container.querySelectorAll('.coupon-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const couponCode = this.querySelector('.coupon-code').textContent;
+                    document.getElementById('couponInput').value = couponCode;
+                    document.getElementById('couponInput').focus();
+                });
+            });
+        }
+
+        async function loadUsedCoupons(userId) {
+            try {
+                const { data: usedCoupons, error } = await supabaseClient
+                    .from('coupon_usage_history')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('applied_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                displayUsedCoupons(usedCoupons || []);
+                
+            } catch (error) {
+                console.error('Error loading used coupons:', error);
+            }
+        }
+
+        function displayUsedCoupons(usedCoupons) {
+            const container = document.getElementById('usedCouponsList');
+            
+            if (usedCoupons.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No Coupons Used Yet</h3>
+                        <p>Apply your first coupon to see it here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = usedCoupons.map(usage => `
+                <div class="used-coupon-item">
+                    <div class="used-coupon-info">
+                        <h4>${usage.coupon_code}</h4>
+                        <p>Used on ${new Date(usage.applied_at).toLocaleDateString()}</p>
+                    </div>
+                    <div class="used-coupon-amount">
+                        -${formatCurrency(usage.discount_amount || 0)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function applyCoupon() {
+            const couponCode = document.getElementById('couponInput').value.trim().toUpperCase();
+            
+            if (!couponCode) {
+                showErrorModal('Missing Code', 'Please enter a coupon code to apply.');
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            if (!user) return;
+
+            try {
+                // Validate coupon
+                const { data: coupon, error } = await supabaseClient
+                    .from('coupons')
+                    .select('*')
+                    .eq('code', couponCode)
+                    .eq('is_active', true)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        showErrorModal('Invalid Code', 'The coupon code you entered is invalid. Please check and try again.');
+                    } else {
+                        throw error;
+                    }
+                    return;
+                }
+
+                // Check if coupon is valid
+                const validationResult = await validateCoupon(coupon, user.id);
+                
+                if (!validationResult.valid) {
+                    showErrorModal('Cannot Apply Coupon', validationResult.message);
+                    return;
+                }
+
+                // Apply coupon to user account
+                await applyCouponToUser(coupon, user.id);
+                
+                // Show success modal
+                showSuccessModal(coupon);
+                
+                // Clear input
+                document.getElementById('couponInput').value = '';
+                
+                // Reload data
+                await Promise.all([
+                    loadAvailableCoupons(),
+                    loadUsedCoupons(user.id)
+                ]);
+                
+            } catch (error) {
+                console.error('Error applying coupon:', error);
+                showErrorModal('Application Failed', 'An error occurred while applying the coupon. Please try again.');
+            }
+        }
+
+        async function validateCoupon(coupon, userId) {
+            const now = new Date();
+            const validUntil = new Date(coupon.valid_until);
+            
+            // Check expiration
+            if (now > validUntil) {
+                return { valid: false, message: 'This coupon has expired.' };
+            }
+            
+            // Check usage limit
+            if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
+                return { valid: false, message: 'This coupon has reached its usage limit.' };
+            }
+            
+            // Check if user has already used this coupon
+            const { data: userCoupon, error } = await supabaseClient
+                .from('user_coupons')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('coupon_id', coupon.id)
+                .single();
+
+            if (userCoupon && !error) {
+                return { valid: false, message: 'You have already used this coupon.' };
+            }
+            
+            return { valid: true, message: 'Coupon is valid.' };
+        }
+
+        async function applyCouponToUser(coupon, userId) {
+            // Add to user_coupons table
+            const { error: userCouponError } = await supabaseClient
+                .from('user_coupons')
+                .insert([
+                    {
+                        user_id: userId,
+                        coupon_id: coupon.id
+                    }
+                ]);
+
+            if (userCouponError) throw userCouponError;
+
+            // Update coupon usage count
+            const { error: updateError } = await supabaseClient
+                .from('coupons')
+                .update({ 
+                    used_count: coupon.used_count + 1,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', coupon.id);
+
+            if (updateError) throw updateError;
+
+            // Add to usage history
+            const { error: historyError } = await supabaseClient
+                .from('coupon_usage_history')
+                .insert([
+                    {
+                        user_id: userId,
+                        coupon_code: coupon.code,
+                        discount_amount: calculateDiscountAmount(coupon, 10000) // Example amount
+                    }
+                ]);
+
+            if (historyError) throw historyError;
+        }
+
+        function showSuccessModal(coupon) {
+            const discountDisplay = getDiscountDisplay(coupon);
+            
+            document.getElementById('successTitle').textContent = `${discountDisplay.value} Discount Applied!`;
+            document.getElementById('discountAmount').textContent = discountDisplay.value;
+            document.getElementById('modalCouponCode').textContent = coupon.code;
+            document.getElementById('modalDiscountType').textContent = formatDiscountType(coupon.discount_type);
+            document.getElementById('modalMinOrder').textContent = formatCurrency(coupon.min_order_amount || 0);
+            document.getElementById('modalValidUntil').textContent = new Date(coupon.valid_until).toLocaleDateString();
+            document.getElementById('successMessage').textContent = coupon.description || 'This coupon has been added to your account and will be automatically applied to your next eligible order.';
+
+            const successModal = document.getElementById('successModal');
+            const overlay = document.getElementById('overlay');
+            
+            successModal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showErrorModal(title, message) {
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorMessage').textContent = message;
+
+            const errorModal = document.getElementById('errorModal');
+            const overlay = document.getElementById('overlay');
+            
+            errorModal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function getDiscountDisplay(coupon) {
+            switch (coupon.discount_type) {
+                case 'percentage':
+                    return {
+                        value: `${coupon.discount_value}%`,
+                        type: 'OFF',
+                        isSmall: false
+                    };
+                case 'fixed':
+                    return {
+                        value: formatCurrency(coupon.discount_value),
+                        type: 'OFF',
+                        isSmall: coupon.discount_value >= 10000
+                    };
+                case 'free_delivery':
+                    return {
+                        value: 'FREE',
+                        type: 'DELIVERY',
+                        isSmall: false
+                    };
+                case 'points_multiplier':
+                    return {
+                        value: `${coupon.discount_value}x`,
+                        type: 'POINTS',
+                        isSmall: false
+                    };
+                default:
+                    return {
+                        value: 'OFF',
+                        type: '',
+                        isSmall: false
+                    };
+            }
+        }
+
+        function formatDiscountType(type) {
+            const types = {
+                'percentage': 'Percentage Discount',
+                'fixed': 'Fixed Amount Discount',
+                'free_delivery': 'Free Delivery',
+                'points_multiplier': 'Points Multiplier'
+            };
+            return types[type] || type;
+        }
+
+        function calculateDiscountAmount(coupon, orderAmount) {
+            if (orderAmount < coupon.min_order_amount) return 0;
+            
+            switch (coupon.discount_type) {
+                case 'percentage':
+                    const discount = orderAmount * (coupon.discount_value / 100);
+                    return coupon.max_discount ? Math.min(discount, coupon.max_discount) : discount;
+                case 'fixed':
+                    return Math.min(coupon.discount_value, orderAmount);
+                case 'free_delivery':
+                    return 1500; // Assuming delivery cost is 1500 FCFA
+                default:
+                    return 0;
+            }
+        }
+
+        function isCouponExpiringSoon(validUntil) {
+            const now = new Date();
+            const expiry = new Date(validUntil);
+            const daysUntilExpiry = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            return daysUntilExpiry <= 3;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-CM', {
+                style: 'currency',
+                currency: 'XAF'
+            }).format(amount);
+        }
+
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                box-shadow: var(--shadow);
+                z-index: 1001;
+                transform: translateX(150%);
+                transition: transform 0.4s ease;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(150%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 400);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Rewards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --bronze: #CD7F32;
+            --silver: #C0C0C0;
+            --gold: #FFD700;
+            --platinum: #E5E4E2;
+            --elite: #FF6B35;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header Styles - Mobile Optimized */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 0 16px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            max-width: 100%;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--dark);
+            white-space: nowrap;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            z-index: 1002;
+            flex-shrink: 0;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2px;
+            background: var(--dark);
+            transition: var(--transition);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: var(--transition);
+            padding: 80px 24px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 16px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 16px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+
+        .mobile-nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .mobile-nav-links a i {
+            width: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* Bottom Navigation - Mobile Only */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 11px;
+            transition: var(--transition);
+            flex: 1;
+            padding: 4px 2px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        /* Main Content - Mobile Optimized */
+        .main-content {
+            padding: 20px 0 80px;
+        }
+
+        .rewards-header {
+            margin-bottom: 24px;
+        }
+
+        .welcome-section h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* DP Balance Card - Mobile Optimized */
+        .dp-balance-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dp-balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .dp-balance-card h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .dp-balance {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .dp-value {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Rewards Tabs - Mobile Optimized */
+        .rewards-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .rewards-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .rewards-tab {
+            padding: 10px 14px;
+            border-radius: 20px;
+            background: var(--light);
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .rewards-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .rewards-tab i {
+            font-size: 14px;
+        }
+
+        /* Rewards Grid - Mobile First */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .reward-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid #f0f0f0;
+        }
+
+        .reward-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .reward-image {
+            height: 140px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            position: relative;
+        }
+
+        .reward-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .reward-content {
+            padding: 16px;
+        }
+
+        .reward-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+
+        .reward-description {
+            color: var(--gray);
+            font-size: 13px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .reward-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .reward-cost {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .reward-cost i {
+            font-size: 14px;
+        }
+
+        .reward-tier {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .tier-bronze { background: var(--bronze); color: white; }
+        .tier-silver { background: var(--silver); color: var(--dark); }
+        .tier-gold { background: var(--gold); color: var(--dark); }
+        .tier-platinum { background: var(--platinum); color: var(--dark); }
+        .tier-elite { background: var(--elite); color: white; }
+
+        .reward-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 14px;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-disabled {
+            background: var(--light);
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--light);
+            border-left: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles - Mobile Optimized */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 140, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .modal-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .reward-details {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .reward-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .reward-info {
+            flex: 1;
+        }
+
+        .reward-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .reward-info p {
+            color: var(--gray);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .reward-cost-large {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirmation-message {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Details Modal Specific Styles */
+        .details-modal .modal-content {
+            max-width: 500px;
+        }
+
+        .reward-features {
+            margin: 20px 0;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+
+        .feature-list li i {
+            color: var(--success);
+            font-size: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .reward-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .tier-requirements {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .tier-requirements h4 {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .tier-requirements p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        /* Error Modal Specific Styles */
+        .error-modal .modal-icon {
+            background: rgba(238, 90, 82, 0.1);
+            color: var(--danger);
+        }
+
+        .error-modal .modal-header h2 {
+            color: var(--danger);
+        }
+
+        /* Warning Modal Specific Styles */
+        .warning-modal .modal-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .warning-modal .modal-header h2 {
+            color: var(--warning);
+        }
+
+        /* Success Modal Specific Styles */
+        .success-modal .modal-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+            
+            .rewards-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (max-width: 767px) {
+            .btn {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            .reward-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .reward-details {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            
+            .reward-icon {
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="navbar">
+            <a href="dashboard.html" class="logo">
+                <div class="logo-icon">D</div>
+                <div class="logo-text">DELE<span>VVA</span></div>
+            </a>
+            
+            <div class="nav-icons">
+                <!-- Notification Icon -->
+                <div class="nav-icon notification-icon" id="notificationIcon">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationBadge" style="display: none;">0</span>
+                </div>
+                
+                <div class="user-profile" id="userProfile">
+                    <!-- User initials will be inserted here -->
+                </div>
+                
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+            <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+            <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+            <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="vip.html"><i class="fas fa-star"></i> VIP</a></li>
+            <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+            <li id="mobileAuthButtons">
+                <!-- Login/Logout buttons will be inserted here -->
+            </li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Rewards Header -->
+            <div class="rewards-header">
+                <div class="welcome-section">
+                    <h1>Delevva Rewards 🎁</h1>
+                    <p>Redeem your Delevva Points for amazing rewards</p>
+                </div>
+            </div>
+
+            <!-- DP Balance Card -->
+            <div class="dp-balance-card">
+                <h2>Your Delevva Points Balance</h2>
+                <div class="dp-balance" id="dpBalance">0 DP</div>
+                <div class="dp-value">Redeemable for discounts and exclusive rewards</div>
+            </div>
+
+            <!-- Rewards Tabs -->
+            <div class="rewards-tabs">
+                <button class="rewards-tab active" data-category="all">
+                    <i class="fas fa-gift"></i> All
+                </button>
+                <button class="rewards-tab" data-category="discounts">
+                    <i class="fas fa-percentage"></i> Discounts
+                </button>
+                <button class="rewards-tab" data-category="vouchers">
+                    <i class="fas fa-ticket-alt"></i> Vouchers
+                </button>
+                <button class="rewards-tab" data-category="premium">
+                    <i class="fas fa-crown"></i> Premium
+                </button>
+            </div>
+
+            <!-- Rewards Grid -->
+            <div class="rewards-grid" id="rewardsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="services.html" class="nav-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>Deliver</span>
+        </a>
+        <a href="rewards.html" class="nav-item active">
+            <i class="fas fa-gift"></i>
+            <span>Rewards</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Redeem Modal -->
+    <div class="modal" id="redeemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Redeem Reward</h2>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <p>Confirm your redemption details</p>
+            
+            <div class="reward-details">
+                <div class="reward-icon" id="modalRewardIcon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="reward-info">
+                    <h3 id="modalRewardTitle">Reward Title</h3>
+                    <p id="modalRewardDescription">Reward description goes here</p>
+                    <div class="reward-cost-large" id="modalRewardCost">
+                        <i class="fas fa-coins"></i>
+                        <span>0 DP</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="confirmation-message">
+                <p>Your Delevva Points balance: <strong id="modalUserBalance">0 DP</strong></p>
+                <p>After redemption: <strong id="modalRemainingBalance">0 DP</strong></p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="cancelRedeem">Cancel</button>
+                <button class="btn btn-primary" id="confirmRedeem">Redeem Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal success-modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Success!</h2>
+                <button class="modal-close" id="closeSuccessModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="text-align: center;">
+                <div class="modal-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <p id="successMessage">Your reward has been redeemed successfully</p>
+                <button class="btn btn-primary" id="continueSuccessModal" style="margin-top: 20px;">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal error-modal" id="errorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Oops!</h2>
+                <button class="modal-close" id="closeErrorModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="text-align: center;">
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p id="errorMessage">There was an issue with your redemption</p>
+                <button class="btn btn-primary" id="continueErrorModal" style="margin-top: 20px;">Okay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal warning-modal" id="warningModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Notice</h2>
+                <button class="modal-close" id="closeWarningModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="text-align: center;">
+                <div class="modal-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <p id="warningMessage"></p>
+                <button class="btn btn-primary" id="continueWarningModal" style="margin-top: 20px;">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal details-modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reward Details</h2>
+                <button class="modal-close" id="closeDetailsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="reward-details">
+                <div class="reward-icon" id="detailsRewardIcon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="reward-info">
+                    <h3 id="detailsRewardTitle">Reward Title</h3>
+                    <p id="detailsRewardDescription">Reward description goes here</p>
+                    <div class="reward-cost-large" id="detailsRewardCost">
+                        <i class="fas fa-coins"></i>
+                        <span>0 DP</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reward-features">
+                <h4 style="margin-bottom: 10px; color: var(--dark);">Features:</h4>
+                <ul class="feature-list" id="detailsFeatures">
+                    <!-- Features will be added here -->
+                </ul>
+            </div>
+
+            <div class="reward-stats" id="detailsStats">
+                <!-- Stats will be added here -->
+            </div>
+
+            <div class="tier-requirements" id="detailsTierInfo">
+                <!-- Tier info will be added here -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="closeDetailsBtn">Close</button>
+                <button class="btn btn-primary" id="redeemFromDetailsBtn">Redeem Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let currentReward = null;
+        let rewardsData = [];
+        let userDPBalance = 0; // Store user's DP balance globally
+
+        // Global variables for notifications
+        let notificationIcon, notificationsModal, notificationsModalClose, notificationBadge, announcementsList;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeRewardsPage();
+        });
+
+        async function initializeRewardsPage() {
+            // Initialize notification system
+            initializeNotificationSystem();
+
+            // Mobile menu
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('overlay');
+            
+            hamburger.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            overlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Rewards tabs
+            document.querySelectorAll('.rewards-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.rewards-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const category = this.dataset.category;
+                    filterRewards(category);
+                });
+            });
+
+            // Modal events
+            document.getElementById('closeModal').addEventListener('click', closeRedeemModal);
+            document.getElementById('cancelRedeem').addEventListener('click', closeRedeemModal);
+            document.getElementById('confirmRedeem').addEventListener('click', confirmRedemption);
+            document.getElementById('closeSuccessModal').addEventListener('click', closeSuccessModal);
+            document.getElementById('continueSuccessModal').addEventListener('click', closeSuccessModal);
+            document.getElementById('closeErrorModal').addEventListener('click', closeErrorModal);
+            document.getElementById('continueErrorModal').addEventListener('click', closeErrorModal);
+            document.getElementById('closeWarningModal').addEventListener('click', closeWarningModal);
+            document.getElementById('continueWarningModal').addEventListener('click', closeWarningModal);
+            document.getElementById('closeDetailsModal').addEventListener('click', closeDetailsModal);
+            document.getElementById('closeDetailsBtn').addEventListener('click', closeDetailsModal);
+            document.getElementById('redeemFromDetailsBtn').addEventListener('click', redeemFromDetails);
+
+            // Close modals when clicking outside
+            document.getElementById('redeemModal').addEventListener('click', function(e) {
+                if (e.target === this) closeRedeemModal();
+            });
+            
+            document.getElementById('successModal').addEventListener('click', function(e) {
+                if (e.target === this) closeSuccessModal();
+            });
+            
+            document.getElementById('errorModal').addEventListener('click', function(e) {
+                if (e.target === this) closeErrorModal();
+            });
+            
+            document.getElementById('warningModal').addEventListener('click', function(e) {
+                if (e.target === this) closeWarningModal();
+            });
+            
+            document.getElementById('detailsModal').addEventListener('click', function(e) {
+                if (e.target === this) closeDetailsModal();
+            });
+
+            await checkAuthAndLoadData();
+            
+            // Set up periodic announcement checks (every 5 minutes)
+            setInterval(loadAnnouncements, 5 * 60 * 1000);
+        }
+
+        function initializeNotificationSystem() {
+            notificationIcon = document.getElementById('notificationIcon');
+            notificationsModal = document.getElementById('notificationsModal');
+            notificationsModalClose = document.getElementById('notificationsModalClose');
+            notificationBadge = document.getElementById('notificationBadge');
+            announcementsList = document.getElementById('announcementsList');
+
+            // Setup notification event listeners
+            if (notificationIcon) {
+                notificationIcon.addEventListener('click', function() {
+                    notificationsModal.classList.add('active');
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    loadAnnouncements();
+                });
+            }
+
+            if (notificationsModalClose) {
+                notificationsModalClose.addEventListener('click', function() {
+                    notificationsModal.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+        }
+
+        async function checkAuthAndLoadData() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                // Update mobile menu with login/register buttons
+                const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+                if (mobileAuthButtons) {
+                    mobileAuthButtons.innerHTML = `
+                        <li><a href="index.html" class="btn btn-secondary" style="display: block; text-align: center; margin: 10px 0;">Login</a></li>
+                        <li><a href="index.html" class="btn btn-primary" style="display: block; text-align: center; margin: 10px 0;">Register</a></li>
+                    `;
+                }
+                
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+
+            // Set user info
+            document.getElementById('userProfile').textContent = (user.name || 'U').charAt(0).toUpperCase();
+
+            // Update mobile menu with logout button
+            const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+            if (mobileAuthButtons) {
+                mobileAuthButtons.innerHTML = `
+                    <li><a href="#" id="logoutBtn" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+                
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    localStorage.removeItem('delevva_user');
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Load user data and rewards
+            await Promise.all([
+                loadUserData(user.id),
+                loadRewardsFromDatabase(),
+                loadAnnouncements()
+            ]);
+        }
+
+        async function loadUserData(userId) {
+            try {
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // Profile doesn't exist, create it
+                        await createUserProfileFromId(userId);
+                        // Try loading again
+                        return await loadUserData(userId);
+                    }
+                    throw error;
+                }
+
+                updateUserUI(profile);
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                // Show fallback data
+                showFallbackData();
+            }
+        }
+
+        function updateUserUI(profile) {
+            // Update DP balance
+            userDPBalance = profile.delevva_points || 0;
+            document.getElementById('dpBalance').textContent = `${userDPBalance} DP`;
+            
+            // Update user name and avatar if different from localStorage
+            const storedUser = JSON.parse(localStorage.getItem('delevva_user'));
+            if (storedUser && profile.full_name && storedUser.name !== profile.full_name) {
+                storedUser.name = profile.full_name;
+                localStorage.setItem('delevva_user', JSON.stringify(storedUser));
+                
+                document.getElementById('userProfile').textContent = profile.full_name.charAt(0).toUpperCase();
+            }
+        }
+
+        function showFallbackData() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            userDPBalance = 0;
+            document.getElementById('dpBalance').textContent = '0 DP';
+        }
+
+        async function createUserProfileFromId(userId) {
+            try {
+                // Get user info from auth
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                
+                if (error) throw error;
+
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: userId,
+                            full_name: user.user_metadata.full_name || user.email.split('@')[0],
+                            email: user.email,
+                            phone: user.user_metadata.phone || '',
+                            delevva_points: 10,
+                            loyalty_tier: 'bronze',
+                            total_orders: 0,
+                            total_spent: 0,
+                            join_date: new Date().toISOString()
+                        }
+                    ]);
+
+                if (profileError) throw profileError;
+                
+            } catch (error) {
+                console.error('Error creating profile from ID:', error);
+            }
+        }
+
+        async function loadRewardsFromDatabase() {
+            try {
+                const { data: rewards, error } = await supabaseClient
+                    .from('rewards')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('cost', { ascending: true });
+
+                if (error) {
+                    console.error('Error loading rewards from database:', error);
+                    showEmptyState('Error loading rewards. Please try again.');
+                    return;
+                }
+
+                if (!rewards || rewards.length === 0) {
+                    showEmptyState('No rewards available at the moment. Check back later!');
+                    return;
+                }
+
+                rewardsData = rewards;
+                renderRewards(rewards);
+                
+            } catch (error) {
+                console.error('Error loading rewards:', error);
+                showEmptyState('Error loading rewards. Please try again.');
+            }
+        }
+
+        function renderRewards(rewards) {
+            const container = document.getElementById('rewardsGrid');
+
+            if (rewards.length === 0) {
+                showEmptyState('No rewards available for this category.');
+                return;
+            }
+
+            container.innerHTML = rewards.map(reward => {
+                const canAfford = userDPBalance >= reward.cost;
+                const isOutOfStock = reward.stock_quantity !== null && reward.stock_quantity <= 0;
+                
+                return `
+                    <div class="reward-card" data-category="${reward.category}" data-tier="${reward.tier}">
+                        <div class="reward-image">
+                            <i class="${reward.icon || 'fas fa-gift'}"></i>
+                            <div class="reward-badge">${reward.cost} DP</div>
+                        </div>
+                        <div class="reward-content">
+                            <h3 class="reward-title">${reward.title}</h3>
+                            <p class="reward-description">${reward.description}</p>
+                            <div class="reward-meta">
+                                <div class="reward-cost">
+                                    <i class="fas fa-coins"></i>
+                                    <span>${reward.cost} DP</span>
+                                </div>
+                                <div class="reward-tier tier-${reward.tier}">${reward.tier.charAt(0).toUpperCase() + reward.tier.slice(1)}</div>
+                            </div>
+                            ${isOutOfStock ? 
+                                `<div class="reward-actions">
+                                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                </div>` :
+                                `<div class="reward-actions">
+                                    <button class="btn ${canAfford ? 'btn-primary' : 'btn-disabled'}" 
+                                            ${canAfford ? '' : 'disabled'}
+                                            onclick="openRedeemModal(${reward.id})">
+                                        ${canAfford ? 'Redeem' : 'Not Enough DP'}
+                                    </button>
+                                    <button class="btn btn-outline" onclick="showRewardDetails(${reward.id})">
+                                        Details
+                                    </button>
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showEmptyState(message) {
+            const container = document.getElementById('rewardsGrid');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-gift"></i>
+                    <h3>No Rewards Available</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function filterRewards(category) {
+            if (category === 'all') {
+                renderRewards(rewardsData);
+            } else {
+                const filteredRewards = rewardsData.filter(reward => reward.category === category);
+                renderRewards(filteredRewards);
+            }
+        }
+
+        function openRedeemModal(rewardId) {
+            currentReward = rewardsData.find(r => r.id === rewardId);
+            
+            if (!currentReward) return;
+            
+            // Update modal content
+            document.getElementById('modalRewardIcon').innerHTML = `<i class="${currentReward.icon || 'fas fa-gift'}"></i>`;
+            document.getElementById('modalRewardTitle').textContent = currentReward.title;
+            document.getElementById('modalRewardDescription').textContent = currentReward.description;
+            document.getElementById('modalRewardCost').innerHTML = `<i class="fas fa-coins"></i><span>${currentReward.cost} DP</span>`;
+            
+            // Update balance info
+            const remainingBalance = userDPBalance - currentReward.cost;
+            
+            document.getElementById('modalUserBalance').textContent = `${userDPBalance} DP`;
+            document.getElementById('modalRemainingBalance').textContent = `${remainingBalance} DP`;
+            
+            // Show modal
+            document.getElementById('redeemModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showRewardDetails(rewardId) {
+            const reward = rewardsData.find(r => r.id === rewardId);
+            
+            if (!reward) return;
+            
+            currentReward = reward;
+            
+            // Update modal content
+            document.getElementById('detailsRewardIcon').innerHTML = `<i class="${reward.icon || 'fas fa-gift'}"></i>`;
+            document.getElementById('detailsRewardTitle').textContent = reward.title;
+            document.getElementById('detailsRewardDescription').textContent = reward.description;
+            document.getElementById('detailsRewardCost').innerHTML = `<i class="fas fa-coins"></i><span>${reward.cost} DP</span>`;
+            
+            // Update features
+            const featuresList = document.getElementById('detailsFeatures');
+            const features = getRewardFeatures(reward);
+            featuresList.innerHTML = features.map(feature => `
+                <li><i class="fas fa-check"></i> ${feature}</li>
+            `).join('');
+            
+            // Update stats
+            const statsContainer = document.getElementById('detailsStats');
+            const stockInfo = reward.stock_quantity !== null ? `${reward.stock_quantity} available` : 'Unlimited';
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">Category</div>
+                    <div class="stat-value">${reward.category}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Required Tier</div>
+                    <div class="stat-value">${reward.tier.charAt(0).toUpperCase() + reward.tier.slice(1)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Stock</div>
+                    <div class="stat-value">${stockInfo}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Your Balance</div>
+                    <div class="stat-value">${userDPBalance} DP</div>
+                </div>
+            `;
+            
+            // Update tier info
+            const tierInfo = document.getElementById('detailsTierInfo');
+            tierInfo.innerHTML = `
+                <h4>Tier Requirement</h4>
+                <p>This reward requires ${reward.tier.charAt(0).toUpperCase() + reward.tier.slice(1)} tier or higher</p>
+            `;
+            
+            // Update redeem button state
+            const redeemBtn = document.getElementById('redeemFromDetailsBtn');
+            if (userDPBalance >= reward.cost && (reward.stock_quantity === null || reward.stock_quantity > 0)) {
+                redeemBtn.disabled = false;
+                redeemBtn.textContent = 'Redeem Now';
+            } else {
+                redeemBtn.disabled = true;
+                if (userDPBalance < reward.cost) {
+                    redeemBtn.textContent = 'Not Enough DP';
+                } else {
+                    redeemBtn.textContent = 'Out of Stock';
+                }
+            }
+            
+            // Show modal
+            document.getElementById('detailsModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function getRewardFeatures(reward) {
+            // Default features based on reward category and tier
+            const baseFeatures = [
+                'Instant digital delivery',
+                'No expiration date',
+                'Easy to use'
+            ];
+            
+            const categoryFeatures = {
+                discounts: ['Apply to any order', 'Combine with other offers', 'Instant application'],
+                vouchers: ['Digital voucher code', 'Share with friends', 'Multiple uses'],
+                premium: ['Priority support', 'Exclusive access', 'Premium quality'],
+                exclusive: ['Limited edition', 'VIP treatment', 'Special recognition']
+            };
+            
+            const tierFeatures = {
+                bronze: ['Standard benefits'],
+                silver: ['Enhanced value', 'Better rates'],
+                gold: ['Premium benefits', 'Extra bonuses'],
+                platinum: ['VIP treatment', 'Maximum value'],
+                elite: ['Ultimate benefits', 'Exclusive perks']
+            };
+            
+            return [
+                ...baseFeatures,
+                ...(categoryFeatures[reward.category] || ['Great value']),
+                ...(tierFeatures[reward.tier] || ['Tier benefits'])
+            ];
+        }
+
+        function redeemFromDetails() {
+            closeDetailsModal();
+            openRedeemModal(currentReward.id);
+        }
+
+        function closeRedeemModal() {
+            document.getElementById('redeemModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentReward = null;
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warningModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentReward = null;
+        }
+
+        function showErrorModal(message, details = null) {
+            document.getElementById('errorMessage').textContent = message;
+            
+            if (details) {
+                document.getElementById('errorDetailsText').textContent = details;
+                document.getElementById('errorDetails').style.display = 'block';
+            } else {
+                document.getElementById('errorDetails').style.display = 'none';
+            }
+            
+            closeRedeemModal();
+            document.getElementById('errorModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showWarningModal(message) {
+            document.getElementById('warningMessage').textContent = message;
+            
+            closeRedeemModal();
+            document.getElementById('warningModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        async function confirmRedemption() {
+            if (!currentReward) return;
+            
+            try {
+                // Get current user
+                const user = JSON.parse(localStorage.getItem('delevva_user'));
+                if (!user) {
+                    showErrorModal('Please log in to redeem rewards.');
+                    return;
+                }
+                
+                // Check if user has enough points (using our global variable)
+                if (userDPBalance < currentReward.cost) {
+                    showWarningModal('You do not have enough Delevva Points to redeem this reward.');
+                    return;
+                }
+
+                // Check stock availability
+                if (currentReward.stock_quantity !== null) {
+                    const { data: rewardStock, error: stockCheckError } = await supabaseClient
+                        .from('rewards')
+                        .select('stock_quantity')
+                        .eq('id', currentReward.id)
+                        .single();
+
+                    if (stockCheckError) {
+                        console.error('Error checking reward stock:', stockCheckError);
+                        throw stockCheckError;
+                    }
+
+                    if (rewardStock.stock_quantity <= 0) {
+                        showWarningModal('This reward is out of stock.');
+                        await loadRewardsFromDatabase(); // Refresh rewards
+                        return;
+                    }
+                }
+
+                // Update user's DP balance in the database
+                const newPoints = userDPBalance - currentReward.cost;
+                
+                const { error: pointsError } = await supabaseClient
+                    .from('profiles')
+                    .update({ delevva_points: newPoints })
+                    .eq('id', user.id);
+                    
+                if (pointsError) {
+                    console.error('Error updating user points:', pointsError);
+                    throw pointsError;
+                }
+
+                // Update our global balance variable
+                userDPBalance = newPoints;
+
+                // Update reward stock if applicable
+                if (currentReward.stock_quantity !== null) {
+                    const { error: stockError } = await supabaseClient
+                        .from('rewards')
+                        .update({ stock_quantity: currentReward.stock_quantity - 1 })
+                        .eq('id', currentReward.id);
+
+                    if (stockError) {
+                        console.error('Error updating reward stock:', stockError);
+                        throw stockError;
+                    }
+                }
+                
+                // Record the redemption
+                try {
+                    const { error: redemptionError } = await supabaseClient
+                        .from('redemptions')
+                        .insert([
+                            {
+                                user_id: user.id,
+                                reward_id: currentReward.id,
+                                reward_title: currentReward.title,
+                                points_spent: currentReward.cost,
+                                redeemed_at: new Date().toISOString(),
+                                status: 'redeemed'
+                            }
+                        ]);
+                        
+                    if (redemptionError) {
+                        console.warn('Could not record redemption:', redemptionError);
+                        // Continue anyway since the points were already deducted
+                    }
+                } catch (redemptionTableError) {
+                    console.warn('Redemptions table error (continuing anyway):', redemptionTableError);
+                    // Continue with the redemption even if we can't log it
+                }
+                
+                // Update UI
+                document.getElementById('dpBalance').textContent = `${userDPBalance} DP`;
+                
+                // Show success modal
+                closeRedeemModal();
+                document.getElementById('successMessage').textContent = `You've successfully redeemed "${currentReward.title}" for ${currentReward.cost} DP.`;
+                document.getElementById('successModal').classList.add('active');
+                document.getElementById('overlay').classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Reload rewards to update affordability and stock
+                await loadRewardsFromDatabase();
+                
+            } catch (error) {
+                console.error('Error redeeming reward:', error);
+                
+                // Show user-friendly error message
+                if (error.code === 'PGRST205') {
+                    showErrorModal(
+                        'Redemption completed! Your points have been deducted, but we could not log the transaction.',
+                        'Technical issue: Database table not accessible'
+                    );
+                } else {
+                    showErrorModal(
+                        'There was an error redeeming your reward. Please try again.',
+                        error.message || 'Unknown error occurred'
+                    );
+                }
+            }
+        }
+
+        // Load announcements
+        async function loadAnnouncements() {
+            try {
+                const user = JSON.parse(localStorage.getItem('delevva_user'));
+                if (!user) return;
+
+                // Get user's loyalty tier from profile
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('loyalty_tier')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Error fetching user profile:', profileError);
+                    return;
+                }
+
+                const userTier = profile.loyalty_tier || 'bronze';
+
+                // Fetch announcements that are active and target the user's tier or all users
+                const { data: announcements, error } = await supabaseClient
+                    .from('announcements')
+                    .select('*')
+                    .eq('is_active', true)
+                    .or(`target_audience.eq.all,target_audience.eq.${userTier}`)
+                    .or('valid_until.is.null,valid_until.gte.now()')
+                    .order('priority', { ascending: false })
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displayAnnouncements(announcements || []);
+                
+                // Update badge count
+                updateNotificationBadge(announcements?.length || 0);
+                
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+                if (announcementsList) {
+                    announcementsList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gray);">Error loading announcements</div>';
+                }
+            }
+        }
+
+        function displayAnnouncements(announcements) {
+            if (!announcementsList) return;
+            
+            if (announcements.length === 0) {
+                announcementsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No announcements at the moment</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Check back later for updates</p>
+                    </div>
+                `;
+                return;
+            }
+
+            announcementsList.innerHTML = announcements.map(announcement => `
+                <div class="announcement-item ${announcement.type}">
+                    <div class="announcement-header">
+                        <h3 class="announcement-title">${announcement.title}</h3>
+                        <span class="announcement-type ${announcement.type}">${announcement.type}</span>
+                    </div>
+                    <p class="announcement-message">${announcement.message}</p>
+                    <div class="announcement-meta">
+                        <span>For: ${announcement.target_audience} users</span>
+                        <span>${formatDate(announcement.created_at)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update notification badge
+        function updateNotificationBadge(count) {
+            if (notificationBadge) {
+                notificationBadge.textContent = count > 9 ? '9+' : count.toString();
+                notificationBadge.style.display = count > 0 ? 'flex' : 'none';
+                
+                // Add animation for new notifications
+                if (count > 0) {
+                    notificationBadge.classList.add('pulse');
+                    setTimeout(() => {
+                        notificationBadge.classList.remove('pulse');
+                    }, 1000);
+                }
+            }
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+    </script>
+</body>
+</html>

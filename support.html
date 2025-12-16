@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Support Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header Styles - Mobile Optimized */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Bottom Navigation - Mobile First */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 12px;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Support Hero Section */
+        .support-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 100px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .support-hero::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .support-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .support-hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .support-hero p {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            padding: 40px 0;
+            background: white;
+        }
+
+        .section-title {
+            margin-bottom: 24px;
+        }
+
+        .section-title h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .section-title p {
+            color: var(--gray);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid #f0f0f0;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .action-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .action-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 40px 0;
+            background: #f8fafc;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .faq-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .faq-container {
+            margin-bottom: 30px;
+        }
+
+        .faq-item {
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background: #f8fafc;
+        }
+
+        .faq-question i {
+            transition: var(--transition);
+            color: var(--primary);
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: var(--gray);
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        /* Contact Options */
+        .contact-section {
+            padding: 40px 0;
+            background: white;
+        }
+
+        .contact-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .contact-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .contact-card p {
+            color: var(--gray);
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .contact-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .contact-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Live Chat */
+        .live-chat {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            color: var(--dark);
+        }
+
+        /* Chat Modal */
+        .chat-modal .modal-content {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .chat-agent-info h3 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .chat-agent-info p {
+            color: var(--success);
+            font-size: 0.8rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.agent {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input {
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .action-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .contact-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="home.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <div class="nav-icons">
+                    <div class="user-profile" id="userProfile">
+                        <!-- User initials will be inserted here -->
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Support Hero Section -->
+    <section class="support-hero">
+        <div class="container">
+            <div class="support-hero-content">
+                <h1>How can we help you?</h1>
+                <p>Find answers to common questions or get in touch with our support team</p>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search for help...">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+        <div class="container">
+            <div class="section-title">
+                <h2>Quick Help</h2>
+                <p>Get assistance with common issues</p>
+            </div>
+            
+            <div class="action-grid">
+                <div class="action-card" data-action="tracking">
+                    <div class="action-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Track Order</h3>
+                    <p>Check your delivery status</p>
+                </div>
+                
+                <div class="action-card" data-action="returns">
+                    <div class="action-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <h3>Returns & Refunds</h3>
+                    <p>Process returns or request refunds</p>
+                </div>
+                
+                <div class="action-card" data-action="payment">
+                    <div class="action-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3>Payment Issues</h3>
+                    <p>Solve payment problems</p>
+                </div>
+                
+                <div class="action-card" data-action="account">
+                    <div class="action-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3>Account Help</h3>
+                    <p>Manage your account settings</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Quick answers to common questions</p>
+            </div>
+            
+            <div class="faq-categories">
+                <button class="category-btn active" data-category="all">All Questions</button>
+                <button class="category-btn" data-category="delivery">Delivery</button>
+                <button class="category-btn" data-category="payments">Payments</button>
+                <button class="category-btn" data-category="account">Account</button>
+                <button class="category-btn" data-category="returns">Returns</button>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item" data-category="delivery">
+                    <div class="faq-question">
+                        <span>How long does delivery take?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Standard delivery takes 1-3 business days. Express delivery is available for an additional fee and arrives within 24 hours. Delivery times may vary based on your location and product availability.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="payments">
+                    <div class="faq-question">
+                        <span>What payment methods do you accept?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept Orange Money, MTN Mobile Money, credit/debit cards (Visa, MasterCard), and bank transfers. All payments are processed securely through our encrypted payment gateway.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        <span>How do I reset my password?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Click on "Forgot Password" on the login page. Enter your email address, and we'll send you a link to reset your password. The link will expire in 24 hours for security reasons.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="returns">
+                    <div class="faq-question">
+                        <span>What is your return policy?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can return most items within 30 days of delivery for a full refund. Items must be in original condition with tags attached. Some products like perishable goods and personalized items cannot be returned.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="delivery">
+                    <div class="faq-question">
+                        <span>Do you deliver on weekends?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer weekend delivery for an additional fee. You can select weekend delivery during checkout. Standard deliveries are Monday to Friday.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Options -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Contact Support</h2>
+                <p>Get in touch with our support team</p>
+            </div>
+            
+            <div class="contact-options">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h3>Call Us</h3>
+                    <p>Speak directly with our support agents</p>
+                    <button class="contact-btn" data-contact="phone">Call Now</button>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Email Us</h3>
+                    <p>Send us a detailed message</p>
+                    <button class="contact-btn" data-contact="email">Send Email</button>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h3>Live Chat</h3>
+                    <p>Chat with us in real-time</p>
+                    <button class="contact-btn" data-contact="chat">Start Chat</button>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Visit Us</h3>
+                    <p>Find our physical locations</p>
+                    <button class="contact-btn" data-contact="visit">View Locations</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Chat Button -->
+    <div class="live-chat">
+        <div class="chat-button" id="openChat">
+            <i class="fas fa-comment"></i>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="shop.html" class="nav-item">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Shop</span>
+        </a>
+        <a href="vip.html" class="nav-item">
+            <i class="fas fa-crown"></i>
+            <span>VIP</span>
+        </a>
+        <a href="support.html" class="nav-item active">
+            <i class="fas fa-headset"></i>
+            <span>Support</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Contact Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeContactModal">&times;</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title" id="contactModalTitle">Contact Support</h2>
+                <p id="contactModalSubtitle">We're here to help</p>
+            </div>
+            
+            <div class="modal-body">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="contactName" class="form-label">Full Name</label>
+                        <input type="text" id="contactName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactEmail" class="form-label">Email Address</label>
+                        <input type="email" id="contactEmail" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactSubject" class="form-label">Subject</label>
+                        <input type="text" id="contactSubject" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactMessage" class="form-label">Message</label>
+                        <textarea id="contactMessage" class="form-control" required></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelContact">Cancel</button>
+                <button class="btn btn-primary" id="submitContact">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div class="modal chat-modal" id="chatModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeChatModal">&times;</button>
+            
+            <div class="chat-header">
+                <div class="chat-avatar">S</div>
+                <div class="chat-agent-info">
+                    <h3>Sarah Johnson</h3>
+                    <p>Online • Support Agent</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message agent">
+                    Hello! How can I help you today?
+                </div>
+                <div class="message user">
+                    I need help with my recent order
+                </div>
+                <div class="message agent">
+                    Sure, I'd be happy to help. Can you provide your order number?
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message..." id="chatInput">
+                <button class="send-button" id="sendMessage">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication status
+            checkAuthStatus();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize FAQ functionality
+            initFAQ();
+        });
+
+        // Check if user is authenticated
+        async function checkAuthStatus() {
+            const user = localStorage.getItem('delevva_user');
+            const userProfile = document.getElementById('userProfile');
+            
+            if (user) {
+                // User is logged in
+                const userData = JSON.parse(user);
+                currentUser = userData;
+                
+                const initials = getInitials(userData.name);
+                
+                // Display user initials in profile
+                userProfile.textContent = initials;
+            } else {
+                // User is not logged in
+                userProfile.style.display = 'none';
+            }
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Quick action cards
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    handleQuickAction(action);
+                });
+            });
+            
+            // FAQ category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    filterFAQ(category, this);
+                });
+            });
+            
+            // Contact buttons
+            document.querySelectorAll('.contact-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const contactType = this.getAttribute('data-contact');
+                    handleContact(contactType);
+                });
+            });
+            
+            // Search functionality
+            document.querySelector('.search-button').addEventListener('click', performSearch);
+            document.querySelector('.search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Modal close buttons
+            document.getElementById('closeContactModal').addEventListener('click', () => closeModal('contact'));
+            document.getElementById('closeChatModal').addEventListener('click', () => closeModal('chat'));
+            document.getElementById('cancelContact').addEventListener('click', () => closeModal('contact'));
+            
+            // Contact form submission
+            document.getElementById('submitContact').addEventListener('click', submitContactForm);
+            
+            // Chat functionality
+            document.getElementById('openChat').addEventListener('click', () => openModal('chat'));
+            document.getElementById('sendMessage').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        }
+
+        // Initialize FAQ functionality
+        function initFAQ() {
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.parentElement;
+                    
+                    // Close all other FAQ items
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        if (item !== faqItem) {
+                            item.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current FAQ item
+                    faqItem.classList.toggle('active');
+                });
+            });
+        }
+
+        // Handle quick actions
+        function handleQuickAction(action) {
+            switch(action) {
+                case 'tracking':
+                    window.location.href = 'tracking.html';
+                    break;
+                case 'returns':
+                    window.location.href = 'returns.html';
+                    break;
+                case 'payment':
+                    // Show payment help FAQ
+                    filterFAQ('payments');
+                    document.getElementById('payments').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'account':
+                    if (currentUser) {
+                        window.location.href = 'profile.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                    break;
+            }
+        }
+
+        // Filter FAQ by category
+        function filterFAQ(category, button) {
+            // Update active category button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            
+            // Show/hide FAQ items based on category
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Handle contact options
+        function handleContact(contactType) {
+            switch(contactType) {
+                case 'phone':
+                    window.location.href = 'tel:+237677889900';
+                    break;
+                case 'email':
+                    openContactModal('email');
+                    break;
+                case 'chat':
+                    openModal('chat');
+                    break;
+                case 'visit':
+                    window.location.href = 'locations.html';
+                    break;
+            }
+        }
+
+        // Open contact modal
+        function openContactModal(type) {
+            const modal = document.getElementById('contactModal');
+            const title = document.getElementById('contactModalTitle');
+            const subtitle = document.getElementById('contactModalSubtitle');
+            
+            if (type === 'email') {
+                title.textContent = 'Send us an Email';
+                subtitle.textContent = 'We typically respond within 24 hours';
+            }
+            
+            // Pre-fill form if user is logged in
+            if (currentUser) {
+                document.getElementById('contactName').value = currentUser.name;
+                document.getElementById('contactEmail').value = currentUser.email;
+            }
+            
+            openModal('contact');
+        }
+
+        // Perform search
+        function performSearch() {
+            const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+            
+            if (!searchTerm.trim()) {
+                // If search is empty, show all FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.style.display = 'block';
+                });
+                return;
+            }
+            
+            // Search through FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    item.classList.add('active'); // Expand matching items
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Submit contact form
+        function submitContactForm() {
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            if (!name || !email || !subject || !message) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // In a real implementation, you would send this to your backend
+            // For demo purposes, we'll just show a success message
+            alert('Thank you for your message! We will get back to you within 24 hours.');
+            closeModal('contact');
+            
+            // Reset form
+            document.getElementById('contactForm').reset();
+        }
+
+        // Send chat message
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = message;
+            messagesContainer.appendChild(userMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Simulate agent response after a delay
+            setTimeout(() => {
+                const agentMessage = document.createElement('div');
+                agentMessage.className = 'message agent';
+                agentMessage.textContent = getAgentResponse(message);
+                messagesContainer.appendChild(agentMessage);
+                
+                // Scroll to bottom again
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        // Generate agent response (simulated)
+        function getAgentResponse(userMessage) {
+            const responses = [
+                "I understand. Let me check that for you.",
+                "Thanks for providing that information. I can help with that.",
+                "I see what you're asking about. Let me look into it.",
+                "That's a good question. Here's what I can tell you...",
+                "I need to check some details about that. One moment please."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Open modal
+        function openModal(modalType) {
+            const modal = document.getElementById(`${modalType}Modal`);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Focus on input if it's the chat modal
+            if (modalType === 'chat') {
+                setTimeout(() => {
+                    document.getElementById('chatInput').focus();
+                }, 300);
+            }
+        }
+
+        // Close modal
+        function closeModal(modalType) {
+            const modal = document.getElementById(`${modalType}Modal`);
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Helper function to get initials from name
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase();
+        }
+    </script>
+</body>
+</html>

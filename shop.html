@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Partner Shops</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --bronze: #CD7F32;
+            --silver: #C0C0C0;
+            --gold: #FFD700;
+            --platinum: #E5E4E2;
+            --elite: #FF6B35;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --dark-bg: #0F172A;
+            --supermarket: #0EA5E9;
+            --restaurant: #F59E0B;
+            --bakery: #D97706;
+            --local-shop: #10B981;
+            --pharmacy: #8B5CF6;
+            --fast-food: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--dark);
+            transition: var(--transition);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: var(--transition);
+            padding: 80px 30px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 18px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .mobile-nav-links a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 12px;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 0 60px;
+        }
+
+        .shops-header {
+            margin-bottom: 30px;
+        }
+
+        .welcome-section h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Advanced Search & Filter */
+        .advanced-controls {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #eee;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .filter-tag {
+            padding: 6px 12px;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-tag.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-tag i {
+            font-size: 10px;
+        }
+
+        /* Category Sections */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header h2 i {
+            color: var(--primary);
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Shop Cards */
+        .shop-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid #f0f0f0;
+        }
+
+        .shop-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-image {
+            height: 160px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shop-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shop-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .shop-badge.open {
+            background: var(--success);
+        }
+
+        .shop-badge.closed {
+            background: var(--danger);
+        }
+
+        .shop-badge.popular {
+            background: var(--warning);
+        }
+
+        .shop-badge.discount {
+            background: var(--primary);
+        }
+
+        .shop-content {
+            padding: 16px;
+        }
+
+        .shop-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .shop-description {
+            color: var(--gray);
+            font-size: 13px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .shop-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .shop-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: var(--warning);
+        }
+
+        .shop-category {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .shop-category.supermarket { background: rgba(14, 165, 233, 0.1); color: var(--supermarket); }
+        .shop-category.restaurant { background: rgba(245, 158, 11, 0.1); color: var(--restaurant); }
+        .shop-category.bakery { background: rgba(217, 119, 6, 0.1); color: var(--bakery); }
+        .shop-category.local-shop { background: rgba(16, 185, 129, 0.1); color: var(--local-shop); }
+        .shop-category.pharmacy { background: rgba(139, 92, 246, 0.1); color: var(--pharmacy); }
+        .shop-category.fast-food { background: rgba(239, 68, 68, 0.1); color: var(--fast-food); }
+
+        .shop-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .shop-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .shop-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 2001;
+            max-width: 90%;
+            width: 500px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+            padding: 25px 25px 0;
+        }
+
+        .modal-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #f5f5f5;
+        }
+
+        .modal-image {
+            height: 200px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-content {
+            padding: 0 25px 25px;
+        }
+
+        .modal-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .shop-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        /* Responsive Adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .advanced-controls {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .search-box {
+                margin-bottom: 0;
+                flex: 1;
+                max-width: 400px;
+            }
+            
+            .filter-controls {
+                flex-wrap: nowrap;
+            }
+            
+            .shops-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <div class="nav-icons">
+                    <div class="nav-icon cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge">0</span>
+                    </div>
+                    
+                    <div class="user-profile" id="userProfile">
+                        <!-- User initials will be inserted here -->
+                    </div>
+                    
+                    <div class="hamburger" id="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <ul class="mobile-nav-links">
+            <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+            <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+            <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+            <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="vip.html"><i class="fas fa-star"></i> VIP</a></li>
+            <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+            <li><a href="blog.html"><i class="fas fa-book"></i> Blog</a></li>
+            <li><a href="partner.html"><i class="fas fa-building"></i> Partnership</a></li>
+            <li id="mobileAuthButtons">
+                <!-- Login/Logout buttons will be inserted here -->
+            </li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Shop Preview Modal -->
+    <div class="modal" id="shopPreviewModal">
+        <div class="modal-header">
+            <h2 id="modalShopName">Shop Name</h2>
+            <button class="modal-close" id="shopPreviewModalClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-image" id="modalShopImage">
+            <i class="fas fa-store"></i>
+        </div>
+        <div class="modal-content">
+            <p id="modalShopDescription">Shop description will appear here.</p>
+            
+            <div class="shop-details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Category</span>
+                    <span class="detail-value" id="modalShopCategory">Supermarket</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Rating</span>
+                    <span class="detail-value" id="modalShopRating">4.5/5</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Delivery Time</span>
+                    <span class="detail-value" id="modalShopDelivery">15-30 min</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Minimum Order</span>
+                    <span class="detail-value" id="modalShopMinOrder">5,000 FCFA</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value" id="modalShopAddress">123 Main Street</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value" id="modalShopPhone">+237 6XX XXX XXX</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="modalShopNowBtn">Shop Now</button>
+                <button class="btn btn-outline" id="modalCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Shops Header -->
+            <div class="shops-header">
+                <div class="welcome-section">
+                    <h1>Partner Shops & Restaurants 🏪</h1>
+                    <p>Browse our trusted partner establishments for all your needs</p>
+                </div>
+            </div>
+
+            <!-- Advanced Controls -->
+            <div class="advanced-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for shops, restaurants...">
+                </div>
+                <div class="filter-controls">
+                    <select class="filter-select" id="sortSelect">
+                        <option value="featured">Featured</option>
+                        <option value="name">Name: A to Z</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="delivery">Fastest Delivery</option>
+                    </select>
+                    <select class="filter-select" id="categorySelect">
+                        <option value="all">All Categories</option>
+                        <option value="supermarket">Supermarkets</option>
+                        <option value="local-shop">Local Shops</option>
+                        <option value="fast-food">Fast Food</option>
+                        <option value="restaurant">Restaurants</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quick Filter Tags -->
+            <div class="filter-tags">
+                <div class="filter-tag active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Shops
+                </div>
+                <div class="filter-tag" data-category="supermarket">
+                    <i class="fas fa-store"></i> Supermarkets
+                </div>
+                <div class="filter-tag" data-category="local-shop">
+                    <i class="fas fa-shopping-basket"></i> Local Shops
+                </div>
+                <div class="filter-tag" data-category="fast-food">
+                    <i class="fas fa-hamburger"></i> Fast Food
+                </div>
+                <div class="filter-tag" data-category="restaurant">
+                    <i class="fas fa-utensils"></i> Restaurants
+                </div>
+            </div>
+
+            <!-- Supermarkets Section -->
+            <div class="category-section" id="supermarketSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-store"></i> Supermarkets</h2>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="shops-grid" id="supermarketGrid">
+                    <!-- Supermarkets will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Local Shops Section -->
+            <div class="category-section" id="localShopSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-shopping-basket"></i> Local Shops</h2>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="shops-grid" id="localShopGrid">
+                    <!-- Local Shops will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Fast Food Section -->
+            <div class="category-section" id="fastFoodSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-hamburger"></i> Fast Food</h2>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="shops-grid" id="fastFoodGrid">
+                    <!-- Fast Food will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Restaurants Section -->
+            <div class="category-section" id="restaurantSection">
+                <div class="section-header">
+                    <h2><i class="fas fa-utensils"></i> Restaurants</h2>
+                    <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="shops-grid" id="restaurantGrid">
+                    <!-- Restaurants will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="shops.html" class="nav-item active">
+            <i class="fas fa-store"></i>
+            <span>Shops</span>
+        </a>
+        <a href="deals.html" class="nav-item">
+            <i class="fas fa-percentage"></i>
+            <span>Deals</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Sample partner shops data
+        const SHOPS_DATA = [
+            // Supermarkets
+            {
+                id: 1,
+                name: "Santa Lucia Supermarket",
+                description: "Your one-stop supermarket for all groceries, fresh produce, and household items. We offer a wide selection of local and imported products at competitive prices.",
+                category: "supermarket",
+                rating: 4.2,
+                deliveryTime: "15-30 min",
+                minOrder: 1000,
+                isOpen: true,
+                badge: "popular",
+                image: "santa-lucia.jpg",
+                address: "Douala, Bonaberi Ancienne route",
+                phone: "",
+                deliveryFee: 500,
+                openingHours: "7:00 AM - 10:00 PM"
+            },
+            {
+                id: 2,
+                name: "City Mart Supermarket",
+                description: "Modern supermarket with wide selection of local and imported products. We focus on quality and freshness in all our offerings.",
+                category: "supermarket",
+                rating: 4.6,
+                deliveryTime: "20-35 min",
+                minOrder: 6000,
+                isOpen: true,
+                badge: "discount",
+                image: "city-mart.jpg",
+                address: "321 Market Road, Shopping Center",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 1200,
+                openingHours: "8:00 AM - 9:00 PM"
+            },
+            {
+                id: 3,
+                name: "Fresh Market Groceries",
+                description: "Farm-fresh produce, dairy, and pantry staples at competitive prices. We source directly from local farmers for the best quality.",
+                category: "supermarket",
+                rating: 4.7,
+                deliveryTime: "18-32 min",
+                minOrder: 4500,
+                isOpen: true,
+                badge: null,
+                image: "fresh-market.jpg",
+                address: "258 Produce Road, Market District",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 800,
+                openingHours: "6:00 AM - 11:00 PM"
+            },
+            
+            // Local Shops
+            {
+                id: 4,
+                name: "Corner Store Mini Mart",
+                description: "Your neighborhood convenience store for daily essentials and quick bites. We're here for your everyday needs with extended hours.",
+                category: "local-shop",
+                rating: 4.3,
+                deliveryTime: "5-15 min",
+                minOrder: 2000,
+                isOpen: true,
+                badge: "open",
+                image: "corner-store.jpg",
+                address: "654 Local Street, Residential Area",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 500,
+                openingHours: "24/7"
+            },
+            {
+                id: 5,
+                name: "Quick Stop Convenience",
+                description: "24/7 convenience store for snacks, drinks, and everyday necessities. We're always open when you need us most.",
+                category: "local-shop",
+                rating: 4.2,
+                deliveryTime: "8-18 min",
+                minOrder: 1500,
+                isOpen: true,
+                badge: "open",
+                image: "quick-stop.jpg",
+                address: "753 Convenience Street, Downtown",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 600,
+                openingHours: "24/7"
+            },
+            
+            // Fast Food
+            {
+                id: 6,
+                name: "Burger Palace",
+                description: "Delicious burgers, fries, and shakes made fresh to order. We use 100% beef and fresh ingredients in all our offerings.",
+                category: "fast-food",
+                rating: 4.5,
+                deliveryTime: "10-20 min",
+                minOrder: 3500,
+                isOpen: true,
+                badge: "popular",
+                image: "burger-palace.jpg",
+                address: "456 Fast Food Avenue, Downtown",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 700,
+                openingHours: "10:00 AM - 11:00 PM"
+            },
+            {
+                id: 7,
+                name: "Pizza Express",
+                description: "Freshly baked pizzas with a variety of toppings and crust options. Our dough is made fresh daily for the perfect pizza experience.",
+                category: "fast-food",
+                rating: 4.4,
+                deliveryTime: "15-25 min",
+                minOrder: 4000,
+                isOpen: true,
+                badge: null,
+                image: "pizza-express.jpg",
+                address: "789 Pizza Street, Food Court",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 800,
+                openingHours: "11:00 AM - 10:00 PM"
+            },
+            
+            // Restaurants
+            {
+                id: 8,
+                name: "Savory Palace Restaurant",
+                description: "Authentic local and international cuisine in a cozy atmosphere. Our chefs create memorable dining experiences with every dish.",
+                category: "restaurant",
+                rating: 4.5,
+                deliveryTime: "25-40 min",
+                minOrder: 8000,
+                isOpen: true,
+                badge: null,
+                image: "savory-palace.jpg",
+                address: "789 Food Street, Culinary District",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 1500,
+                openingHours: "12:00 PM - 10:00 PM"
+            },
+            {
+                id: 9,
+                name: "BBQ Grill House",
+                description: "Specializing in grilled meats, burgers, and traditional barbecue dishes. We use premium cuts and our secret marinades.",
+                category: "restaurant",
+                rating: 4.4,
+                deliveryTime: "30-45 min",
+                minOrder: 7000,
+                isOpen: false,
+                badge: "closed",
+                image: "bbq-grill.jpg",
+                address: "147 Grill Avenue, Food Court",
+                phone: "+237 6XX XXX XXX",
+                deliveryFee: 1200,
+                openingHours: "5:00 PM - 11:00 PM"
+            }
+        ];
+
+        let currentUser = null;
+        let currentShopId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeShopsPage();
+        });
+
+        function initializeShopsPage() {
+            // Mobile menu toggle
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const overlay = document.getElementById('overlay');
+            
+            hamburger.addEventListener('click', function() {
+                mobileMenu.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            overlay.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Quick filter tags
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const category = this.dataset.category;
+                    filterShopsByCategory(category);
+                });
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                filterShops();
+            });
+
+            // Sort functionality
+            document.getElementById('sortSelect').addEventListener('change', function() {
+                filterShops();
+            });
+
+            // Category filter
+            document.getElementById('categorySelect').addEventListener('change', function() {
+                filterShops();
+            });
+
+            // Modal controls
+            const shopPreviewModal = document.getElementById('shopPreviewModal');
+            const shopPreviewModalClose = document.getElementById('shopPreviewModalClose');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const modalShopNowBtn = document.getElementById('modalShopNowBtn');
+            
+            shopPreviewModalClose.addEventListener('click', function() {
+                shopPreviewModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            modalCloseBtn.addEventListener('click', function() {
+                shopPreviewModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            modalShopNowBtn.addEventListener('click', function() {
+                if (currentShopId) {
+                    viewShop(currentShopId);
+                }
+            });
+            
+            overlay.addEventListener('click', function() {
+                shopPreviewModal.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+
+            // Load user data and shops
+            checkAuthAndLoadData();
+        }
+
+        async function checkAuthAndLoadData() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                // Update mobile menu with login/register buttons
+                const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+                if (mobileAuthButtons) {
+                    mobileAuthButtons.innerHTML = `
+                        <li><a href="index.html" class="btn btn-secondary" style="display: block; text-align: center; margin: 10px 0;">Login</a></li>
+                        <li><a href="index.html" class="btn btn-primary" style="display: block; text-align: center; margin: 10px 0;">Register</a></li>
+                    `;
+                }
+                
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+
+            // Set user info
+            document.getElementById('userProfile').textContent = user.name.charAt(0).toUpperCase();
+
+            // Update mobile menu with logout button
+            const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+            if (mobileAuthButtons) {
+                mobileAuthButtons.innerHTML = `
+                    <li><a href="#" id="logoutBtn" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                `;
+                
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    localStorage.removeItem('delevva_user');
+                    window.location.href = 'index.html';
+                });
+            }
+
+            // Load shops
+            loadShops();
+        }
+
+        function loadShops() {
+            // Filter shops by category and populate each section
+            const supermarkets = SHOPS_DATA.filter(shop => shop.category === 'supermarket');
+            const localShops = SHOPS_DATA.filter(shop => shop.category === 'local-shop');
+            const fastFood = SHOPS_DATA.filter(shop => shop.category === 'fast-food');
+            const restaurants = SHOPS_DATA.filter(shop => shop.category === 'restaurant');
+            
+            populateShopGrid('supermarketGrid', supermarkets);
+            populateShopGrid('localShopGrid', localShops);
+            populateShopGrid('fastFoodGrid', fastFood);
+            populateShopGrid('restaurantGrid', restaurants);
+        }
+
+        function populateShopGrid(gridId, shops) {
+            const container = document.getElementById(gridId);
+            
+            if (shops.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-store"></i>
+                        <h3>No Shops Available</h3>
+                        <p>Check back later for new partner shops</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = shops.map(shop => {
+                return `
+                    <div class="shop-card" data-category="${shop.category}" data-id="${shop.id}">
+                        <div class="shop-image">
+                            <i class="fas fa-${getShopIcon(shop.category)}"></i>
+                            ${shop.badge ? `<div class="shop-badge ${shop.isOpen ? (shop.badge === 'popular' ? 'popular' : (shop.badge === 'discount' ? 'discount' : 'open')) : 'closed'}">${shop.isOpen ? (shop.badge === 'popular' ? 'Popular' : (shop.badge === 'discount' ? 'Discount' : 'Open')) : 'Closed'}</div>` : ''}
+                        </div>
+                        <div class="shop-content">
+                            <h3 class="shop-title">${shop.name}</h3>
+                            <p class="shop-description">${shop.description}</p>
+                            <div class="shop-meta">
+                                <div class="shop-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>${shop.rating}</span>
+                                </div>
+                                <div class="shop-category ${shop.category}">${getCategoryName(shop.category)}</div>
+                            </div>
+                            <div class="shop-details">
+                                <div class="shop-detail">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${shop.deliveryTime} delivery</span>
+                                </div>
+                                <div class="shop-detail">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>Min. order: ${shop.minOrder.toLocaleString()} FCFA</span>
+                                </div>
+                                <div class="shop-detail">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${shop.address}</span>
+                                </div>
+                            </div>
+                            <div class="shop-actions">
+                                <button class="btn ${shop.isOpen ? 'btn-primary' : 'btn-outline'}" onclick="viewShop(${shop.id})" ${!shop.isOpen ? 'disabled' : ''}>
+                                    ${shop.isOpen ? 'Shop Now' : 'Currently Closed'}
+                                </button>
+                                <button class="btn btn-outline" onclick="previewShop(${shop.id})">
+                                    Preview Shop
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getShopIcon(category) {
+            switch(category) {
+                case 'supermarket': return 'store';
+                case 'restaurant': return 'utensils';
+                case 'fast-food': return 'hamburger';
+                case 'local-shop': return 'shopping-basket';
+                default: return 'store';
+            }
+        }
+
+        function getCategoryName(category) {
+            switch(category) {
+                case 'supermarket': return 'Supermarket';
+                case 'restaurant': return 'Restaurant';
+                case 'fast-food': return 'Fast Food';
+                case 'local-shop': return 'Local Shop';
+                default: return 'Shop';
+            }
+        }
+
+        function filterShops() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sortValue = document.getElementById('sortSelect').value;
+            const categoryValue = document.getElementById('categorySelect').value;
+            
+            let filteredShops = [...SHOPS_DATA];
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredShops = filteredShops.filter(shop => 
+                    shop.name.toLowerCase().includes(searchTerm) || 
+                    shop.description.toLowerCase().includes(searchTerm) ||
+                    shop.address.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by category
+            if (categoryValue !== 'all') {
+                filteredShops = filteredShops.filter(shop => shop.category === categoryValue);
+            }
+            
+            // Sort shops
+            switch (sortValue) {
+                case 'name':
+                    filteredShops.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'rating':
+                    filteredShops.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'delivery':
+                    filteredShops.sort((a, b) => {
+                        const aTime = parseInt(a.deliveryTime);
+                        const bTime = parseInt(b.deliveryTime);
+                        return aTime - bTime;
+                    });
+                    break;
+                default:
+                    // Featured - keep original order
+                    break;
+            }
+            
+            // Update UI - hide/show sections based on filters
+            const sections = ['supermarket', 'local-shop', 'fast-food', 'restaurant'];
+            
+            sections.forEach(section => {
+                const sectionElement = document.getElementById(`${section}Section`);
+                const sectionShops = filteredShops.filter(shop => shop.category === section);
+                
+                if (sectionShops.length > 0) {
+                    sectionElement.style.display = 'block';
+                    populateShopGrid(`${section}Grid`, sectionShops);
+                } else {
+                    sectionElement.style.display = 'none';
+                }
+            });
+        }
+
+        function filterShopsByCategory(category) {
+            if (category === 'all') {
+                // Show all sections
+                const sections = ['supermarket', 'local-shop', 'fast-food', 'restaurant'];
+                sections.forEach(section => {
+                    document.getElementById(`${section}Section`).style.display = 'block';
+                });
+                loadShops();
+            } else {
+                // Show only the selected category
+                const sections = ['supermarket', 'local-shop', 'fast-food', 'restaurant'];
+                sections.forEach(section => {
+                    if (section === category) {
+                        document.getElementById(`${section}Section`).style.display = 'block';
+                    } else {
+                        document.getElementById(`${section}Section`).style.display = 'none';
+                    }
+                });
+                
+                // Also update the dropdown
+                document.getElementById('categorySelect').value = category;
+            }
+        }
+
+        function previewShop(shopId) {
+            const shop = SHOPS_DATA.find(s => s.id === shopId);
+            currentShopId = shopId;
+            
+            // Update modal content
+            document.getElementById('modalShopName').textContent = shop.name;
+            document.getElementById('modalShopDescription').textContent = shop.description;
+            document.getElementById('modalShopCategory').textContent = getCategoryName(shop.category);
+            document.getElementById('modalShopRating').textContent = `${shop.rating}/5`;
+            document.getElementById('modalShopDelivery').textContent = shop.deliveryTime;
+            document.getElementById('modalShopMinOrder').textContent = `${shop.minOrder.toLocaleString()} FCFA`;
+            document.getElementById('modalShopAddress').textContent = shop.address;
+            document.getElementById('modalShopPhone').textContent = shop.phone;
+            
+            // Update modal image
+            const modalImage = document.getElementById('modalShopImage');
+            modalImage.innerHTML = `<i class="fas fa-${getShopIcon(shop.category)}"></i>`;
+            
+            // Show modal
+            const shopPreviewModal = document.getElementById('shopPreviewModal');
+            const overlay = document.getElementById('overlay');
+            
+            shopPreviewModal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // In the partner shops page (shops.html), update the viewShop function:
+
+function viewShop(shopId) {
+    const shop = SHOPS_DATA.find(s => s.id === shopId);
+    
+    // Navigate to the specific shop page
+    if (shop) {
+        // For Santa Lucia Supermarket, redirect to santa-lucia.html
+        if (shop.id === 1) { // Santa Lucia ID
+            window.location.href = 'santa-lucia.html';
+        } else {
+            // For other shops, you can create individual pages or use a template
+            window.location.href = `shop.html?id=${shopId}&name=${encodeURIComponent(shop.name)}`;
+        }
+    }
+}
+    </script>
+</body>
+</html>

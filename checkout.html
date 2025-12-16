@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #0EA5E9;
+            --primary-dark: #0284C7;
+            --primary-light: #38BDF8;
+            --secondary: #10B981;
+            --accent: #10B981;
+            --accent-dark: #059669;
+            --accent-light: #34D399;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --sky-blue: #E0F2FE;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #E0F2FE 0%, #F0FDF4 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            border: 3px solid white;
+            box-shadow: var(--shadow);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 120px 0 60px;
+        }
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .checkout-form {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .checkout-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: var(--dark);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Map Styles */
+        .map-container {
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 2px solid #E5E7EB;
+            position: relative;
+        }
+
+        #deliveryMap {
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .map-btn:hover {
+            background: var(--light);
+        }
+
+        .location-search {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            width: calc(100% - 60px);
+        }
+
+        .location-search input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .location-search input:focus {
+            outline: none;
+        }
+
+        .location-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            font-size: 24px;
+            color: var(--primary);
+            text-shadow: 0 0 3px white;
+            pointer-events: none;
+        }
+
+        .location-details {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .location-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .location-address {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .location-coords {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .payment-method {
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .payment-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .mtn-icon {
+            color: #FFC107;
+        }
+
+        .orange-icon {
+            color: #FF9800;
+        }
+
+        /* Promo Code Section */
+        .promo-section {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .promo-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .promo-input {
+            flex: 1;
+        }
+
+        .btn-promo {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-promo:hover {
+            background: var(--primary-dark);
+        }
+
+        .promo-success {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .promo-error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Summary Styles */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #E5E7EB;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .delivery-details {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .delivery-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .delivery-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .fee-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .fee-normal {
+            background: var(--success);
+            color: white;
+        }
+
+        .fee-premium {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+
+        .btn-checkout:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-checkout:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: white;
+            font-size: 35px;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .modal-text {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+
+        .btn-modal {
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-modal:hover {
+            background: var(--primary-dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                margin-top: 15px;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 8px 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+                    <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+                    <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+                    <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a href="vip.html"><i class="fas fa-star"></i> Vip</a></li>
+                    <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+                    <li><a href="blog.html"><i class="fas fa-book"></i> Blog</a></li>
+                    <li><a href="partner.html"><i class="fas fa-building"></i> Partnership</a></li>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                </ul>
+                
+                <div class="user-menu">
+                    <div class="user-avatar" id="userAvatar">
+                        U
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="checkout-container">
+                <div class="checkout-form">
+                    <h2 class="section-title">Delivery Information</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">Full Name</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number">
+                    </div>
+                    
+                    <h2 class="section-title">Delivery Location</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select your delivery location:</label>
+                        
+                        <div class="location-search">
+                            <input type="text" id="locationSearch" placeholder="Search for your location...">
+                        </div>
+                        
+                        <div class="map-container">
+                            <div id="deliveryMap"></div>
+                            <div class="location-marker">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="map-controls">
+                                <button class="map-btn" id="locateMeBtn" title="Locate Me">
+                                    <i class="fas fa-location-arrow"></i>
+                                </button>
+                                <button class="map-btn" id="zoomInBtn" title="Zoom In">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="map-btn" id="zoomOutBtn" title="Zoom Out">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="location-details" id="locationDetails">
+                            <div class="location-address" id="locationAddress">Location not selected</div>
+                            <div class="location-coords" id="locationCoords">Lat: 0, Lng: 0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="specialInstructions">Special Instructions (Optional)</label>
+                        <textarea id="specialInstructions" class="form-control" rows="3" placeholder="Any special delivery instructions?"></textarea>
+                    </div>
+                    
+                    <h2 class="section-title">Payment Method</h2>
+                    
+                    <div class="form-group">
+                        <div class="payment-methods">
+                            <div class="payment-method" data-provider="mtn">
+                                <div class="payment-icon mtn-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h3>MTN Mobile Money</h3>
+                                <p>Pay with your MTN account</p>
+                            </div>
+                            
+                            <div class="payment-method" data-provider="orange">
+                                <div class="payment-icon orange-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h3>Orange Money</h3>
+                                <p>Pay with your Orange account</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checkout-summary">
+                    <h2 class="section-title">Order Summary</h2>
+                    
+                    <div class="summary-item">
+                        <span>Subtotal</span>
+                        <span id="subtotal">0 FCFA</span>
+                    </div>
+                    
+                    <div class="promo-section">
+                        <h3 style="margin-bottom: 10px; font-size: 16px;">Promo Code</h3>
+                        <div class="promo-input-group">
+                            <input type="text" id="promoCode" class="form-control promo-input" placeholder="Enter promo code">
+                            <button class="btn-promo" id="applyPromo">Apply</button>
+                        </div>
+                        <div id="promoMessage"></div>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Delivery Fee</span>
+                        <span id="deliveryFee">0 FCFA</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Service Fee</span>
+                        <span>500 FCFA</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Discount</span>
+                        <span id="discountAmount">0 FCFA</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="totalAmount">500 FCFA</span>
+                    </div>
+                    
+                    <button class="btn-checkout" id="checkoutBtn" disabled>Complete Order</button>
+                    
+                    <div style="margin-top: 20px; font-size: 12px; color: var(--gray); text-align: center;">
+                        <p>By completing your order, you agree to our <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="modal-title">Order Sent Successfully!</h2>
+            <p class="modal-text">Thank you for your order. We will contact you as soon as possible to confirm your delivery details.</p>
+            <button class="btn-modal" id="modalOkBtn">Continue Shopping</button>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Delivery fee configuration
+        const DELIVERY_FEES = {
+            "centre-équestre": 500,    // Normal fee
+            "ancienne route": 500,     // Normal fee
+            "rail": 1000,              // Far location
+            "nouvelle route": 500,     // Normal fee
+            "4 étages": 500,           // Normal fee
+            "pétit baobab": 1000       // Far location
+        };
+
+        // Promo codes data
+        const PROMO_CODES = {
+            "WELCOME10": { discount: 10, type: "percentage", minOrder: 0 },
+            "FIRSTORDER": { discount: 500, type: "fixed", minOrder: 3000 },
+            "DELEVVA25": { discount: 25, type: "percentage", minOrder: 5000 },
+            "FREEDELIVERY": { discount: 0, type: "free_delivery", minOrder: 0 }
+        };
+
+        // Order data
+        let orderData = {
+            subtotal: 0,
+            deliveryFee: 0,
+            serviceFee: 500, // Fixed service fee
+            discount: 0,
+            total: 500, // Base total with service fee
+            selectedLocation: null,
+            paymentMethod: null,
+            promoCode: null,
+            deliveryTime: "15-30 min"
+        };
+
+        // Map variables
+        let map;
+        let marker;
+        let userLocation = null;
+        let geocoder;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCheckout();
+        });
+
+        async function initializeCheckout() {
+            // Mobile menu toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+
+            // Check authentication
+            await checkAuthStatus();
+            
+            // Initialize map
+            initializeMap();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load order data (in a real app, this would come from the cart)
+            loadOrderData();
+        }
+
+        async function checkAuthStatus() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Set user info
+            document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        function initializeMap() {
+            // Default coordinates (Douala, Cameroon)
+            const defaultLat = 4.0511;
+            const defaultLng = 9.7679;
+            
+            // Initialize the map
+            map = L.map('deliveryMap').setView([defaultLat, defaultLng], 13);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add a marker for the user's location
+            marker = L.marker([defaultLat, defaultLng], {
+                draggable: true,
+                autoPan: true
+            }).addTo(map);
+            
+            // Update location when marker is dragged
+            marker.on('dragend', function() {
+                updateLocationFromMarker();
+            });
+            
+            // Update location when map is clicked
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateLocationFromMarker();
+            });
+            
+            // Initialize geocoder
+            geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false
+            }).addTo(map);
+            
+            geocoder.on('markgeocode', function(e) {
+                const { center, name } = e.geocode;
+                map.setView(center, 16);
+                marker.setLatLng(center);
+                updateLocationDetails(center.lat, center.lng, name);
+            });
+            
+            // Try to get user's current location
+            locateUser();
+        }
+
+        function locateUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        userLocation = { lat, lng };
+                        
+                        // Update map view
+                        map.setView([lat, lng], 15);
+                        marker.setLatLng([lat, lng]);
+                        
+                        // Get address from coordinates
+                        getAddressFromCoords(lat, lng);
+                    },
+                    function(error) {
+                        console.error('Error getting location:', error);
+                        // Use default location
+                        getAddressFromCoords(4.0511, 9.7679);
+                    }
+                );
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+                // Use default location
+                getAddressFromCoords(4.0511, 9.7679);
+            }
+        }
+
+        function updateLocationFromMarker() {
+            const latLng = marker.getLatLng();
+            getAddressFromCoords(latLng.lat, latLng.lng);
+        }
+
+        function getAddressFromCoords(lat, lng) {
+            // In a real application, you would use a reverse geocoding service
+            // For this demo, we'll simulate getting an address
+            const addresses = [
+                "Centre-équestre, Douala, Cameroon",
+                "Ancienne Route, Douala, Cameroon", 
+                "Rail, Douala, Cameroon",
+                "Nouvelle Route, Douala, Cameroon",
+                "4 Étages, Douala, Cameroon",
+                "Pétit Baobab, Douala, Cameroon"
+            ];
+            
+            // Simulate getting a random address based on coordinates
+            const index = Math.floor(Math.abs(lat + lng) % addresses.length);
+            const address = addresses[index];
+            
+            updateLocationDetails(lat, lng, address);
+        }
+
+        function updateLocationDetails(lat, lng, address) {
+            // Update location details display
+            document.getElementById('locationAddress').textContent = address;
+            document.getElementById('locationCoords').textContent = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+            document.getElementById('locationDetails').classList.add('active');
+            
+            // Update order data
+            orderData.selectedLocation = {
+                lat: lat,
+                lng: lng,
+                address: address
+            };
+            
+            // Calculate delivery fee based on location
+            calculateDeliveryFee(address);
+            
+            // Enable checkout button if all required fields are filled
+            checkFormCompletion();
+        }
+
+        function calculateDeliveryFee(address) {
+            let deliveryFee = 500; // Default fee
+            
+            // Check if address contains any of the premium locations
+            if (address.toLowerCase().includes('rail') || address.toLowerCase().includes('pétit baobab')) {
+                deliveryFee = 1000;
+            }
+            
+            // Apply free delivery for orders over 5000 FCFA
+            if (orderData.subtotal >= 5000) {
+                deliveryFee = 0;
+            }
+            
+            // Update order data
+            orderData.deliveryFee = deliveryFee;
+            
+            // Recalculate total
+            calculateTotal();
+            
+            // Update UI
+            updateOrderSummary();
+        }
+
+        function setupEventListeners() {
+            // Locate me button
+            document.getElementById('locateMeBtn').addEventListener('click', function() {
+                locateUser();
+            });
+            
+            // Zoom controls
+            document.getElementById('zoomInBtn').addEventListener('click', function() {
+                map.zoomIn();
+            });
+            
+            document.getElementById('zoomOutBtn').addEventListener('click', function() {
+                map.zoomOut();
+            });
+            
+            // Location search
+            document.getElementById('locationSearch').addEventListener('input', function() {
+                // In a real app, this would trigger geocoding suggestions
+                // For this demo, we'll just update the marker position when Enter is pressed
+            });
+            
+            document.getElementById('locationSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    // Simulate finding the location
+                    const query = this.value.trim();
+                    if (query) {
+                        // In a real app, this would use a geocoding API
+                        // For demo, we'll just move the marker slightly
+                        const currentLatLng = marker.getLatLng();
+                        const newLat = currentLatLng.lat + (Math.random() - 0.5) * 0.01;
+                        const newLng = currentLatLng.lng + (Math.random() - 0.5) * 0.01;
+                        
+                        map.setView([newLat, newLng], 15);
+                        marker.setLatLng([newLat, newLng]);
+                        updateLocationFromMarker();
+                    }
+                }
+            });
+            
+            // Form validation
+            document.getElementById('fullName').addEventListener('input', checkFormCompletion);
+            document.getElementById('phone').addEventListener('input', checkFormCompletion);
+            
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    // Remove selected class from all methods
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked method
+                    this.classList.add('selected');
+                    
+                    // Update order data
+                    orderData.paymentMethod = this.getAttribute('data-provider');
+                    
+                    // Enable checkout button if all required fields are filled
+                    checkFormCompletion();
+                });
+            });
+            
+            // Promo code application
+            document.getElementById('applyPromo').addEventListener('click', function() {
+                applyPromoCode();
+            });
+            
+            // Checkout button
+            document.getElementById('checkoutBtn').addEventListener('click', function() {
+                processCheckout();
+            });
+            
+            // Success modal button
+            document.getElementById('modalOkBtn').addEventListener('click', function() {
+                document.getElementById('successModal').classList.remove('active');
+                window.location.href = 'dashboard.html';
+            });
+        }
+
+        function loadOrderData() {
+            // In a real app, this would fetch cart data from localStorage or API
+            // For demo purposes, we'll use 0 since nothing was added to cart
+            orderData.subtotal = 0;
+            orderData.total = 500; // Base total with service fee
+            
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            document.getElementById('subtotal').textContent = `${orderData.subtotal.toLocaleString()} FCFA`;
+            document.getElementById('deliveryFee').textContent = `${orderData.deliveryFee.toLocaleString()} FCFA`;
+            document.getElementById('discountAmount').textContent = `-${orderData.discount.toLocaleString()} FCFA`;
+            document.getElementById('totalAmount').textContent = `${orderData.total.toLocaleString()} FCFA`;
+        }
+
+        function calculateTotal() {
+            orderData.total = orderData.subtotal + orderData.deliveryFee + orderData.serviceFee - orderData.discount;
+        }
+
+        function applyPromoCode() {
+            const promoCode = document.getElementById('promoCode').value.trim().toUpperCase();
+            const promoMessage = document.getElementById('promoMessage');
+            
+            if (!promoCode) {
+                promoMessage.innerHTML = '<div class="promo-error"><i class="fas fa-exclamation-circle"></i> Please enter a promo code</div>';
+                return;
+            }
+            
+            if (PROMO_CODES[promoCode]) {
+                const promo = PROMO_CODES[promoCode];
+                
+                // Check if order meets minimum requirement
+                if (orderData.subtotal < promo.minOrder) {
+                    promoMessage.innerHTML = `<div class="promo-error"><i class="fas fa-exclamation-circle"></i> Minimum order of ${promo.minOrder.toLocaleString()} FCFA required</div>`;
+                    return;
+                }
+                
+                // Apply discount based on type
+                let discountAmount = 0;
+                
+                if (promo.type === "percentage") {
+                    discountAmount = (orderData.subtotal * promo.discount) / 100;
+                } else if (promo.type === "fixed") {
+                    discountAmount = promo.discount;
+                } else if (promo.type === "free_delivery") {
+                    discountAmount = 0; // We'll handle free delivery separately
+                    orderData.deliveryFee = 0;
+                }
+                
+                // Update order data
+                orderData.discount = discountAmount;
+                orderData.promoCode = promoCode;
+                
+                // Recalculate total
+                calculateTotal();
+                
+                // Update UI
+                updateOrderSummary();
+                
+                // Show success message
+                promoMessage.innerHTML = `<div class="promo-success"><i class="fas fa-check-circle"></i> Promo code applied successfully!</div>`;
+                
+            } else {
+                promoMessage.innerHTML = '<div class="promo-error"><i class="fas fa-exclamation-circle"></i> Invalid promo code</div>';
+            }
+        }
+
+        function checkFormCompletion() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            
+            if (fullName && phone && orderData.selectedLocation && orderData.paymentMethod) {
+                checkoutBtn.disabled = false;
+            } else {
+                checkoutBtn.disabled = true;
+            }
+        }
+
+        async function processCheckout() {
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            
+            // Show loading state
+            checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            checkoutBtn.disabled = true;
+            
+            // Get form data
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const specialInstructions = document.getElementById('specialInstructions').value.trim();
+            
+            // Get user data
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            try {
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Create order object
+                const order = {
+                    user_id: user.id,
+                    customer_name: fullName,
+                    customer_phone: phone,
+                    delivery_location: orderData.selectedLocation,
+                    subtotal: orderData.subtotal,
+                    delivery_fee: orderData.deliveryFee,
+                    service_fee: orderData.serviceFee,
+                    discount: orderData.discount,
+                    total_amount: orderData.total,
+                    payment_method: orderData.paymentMethod,
+                    promo_code: orderData.promoCode,
+                    estimated_time: orderData.deliveryTime,
+                    special_instructions: specialInstructions,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                };
+                
+                // Save order to database
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .insert([order])
+                    .select();
+                
+                if (error) throw error;
+                
+                // Show success modal
+                document.getElementById('successModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error processing order:', error);
+                alert('There was an error processing your order. Please try again.');
+                
+                // Reset button
+                checkoutBtn.innerHTML = 'Complete Order';
+                checkoutBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

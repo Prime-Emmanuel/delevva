@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Virtual Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --bronze: #CD7F32;
+            --silver: #C0C0C0;
+            --gold: #FFD700;
+            --platinum: #E5E4E2;
+            --elite: #FF6B35;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            color: white;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            color: white;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px 0 60px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .welcome-section h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #FFD700 0%, #10B981 50%, #FF8C00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-section p {
+            color: #94A3B8;
+            font-size: 1.1rem;
+        }
+
+        /* Card Creation Section */
+        .card-creation-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .create-card-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .create-card-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.3);
+        }
+
+        .create-card-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Virtual Card Display */
+        .card-display-section {
+            display: none;
+        }
+
+        .card-display-section.active {
+            display: block;
+        }
+
+        .virtual-card-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin: 0 auto 30px;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backface-visibility: hidden;
+            transition: transform 0.6s ease, opacity 0.6s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, 
+                #000000 0%, 
+                #0A5C36 25%, 
+                #FFD700 50%, 
+                #0A5C36 75%, 
+                #000000 100%);
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, 
+                #000000 0%, 
+                #0A5C36 40%, 
+                #FFD700 70%, 
+                #000000 100%);
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .flipped .card-front {
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .flipped .card-back {
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+        }
+
+        .card-type {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        .card-chip {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.3) 50%, transparent 55%);
+        }
+
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: white;
+            text-align: center;
+            margin: 15px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .card-holder, .card-expiry {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Card Back Styles */
+        .card-magnetic-strip {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(45deg, #000000 0%, #333333 50%, #000000 100%);
+        }
+
+        .card-signature {
+            margin-top: 60px;
+            background: white;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #333;
+            font-family: 'Dancing Script', cursive;
+            font-size: 16px;
+        }
+
+        .card-cvv {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Card Actions */
+        .card-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .card-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-action-icon {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .card-action-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Card Stats */
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .card-stat {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .stat-note {
+            font-size: 11px;
+            color: #64748B;
+            margin-top: 5px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #64748B;
+            font-size: 12px;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Card Features Section */
+        .card-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .feature-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        /* Top Up Section */
+        .topup-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .topup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .topup-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .topup-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .topup-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .topup-form {
+            display: none;
+        }
+
+        .topup-form.active {
+            display: block;
+        }
+
+        .amount-selection {
+            margin-bottom: 20px;
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .amount-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .amount-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .amount-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .amount-value {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .amount-label {
+            font-size: 11px;
+            color: #94A3B8;
+        }
+
+        .custom-amount {
+            margin-top: 15px;
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .custom-input::placeholder {
+            color: #94A3B8;
+        }
+
+        .provider-selection {
+            margin-bottom: 20px;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .provider-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .provider-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .provider-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .provider-icon {
+            font-size: 24px;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .topup-summary {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .topup-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .topup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.3);
+        }
+
+        .topup-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            .card-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .card-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .card-features {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .amount-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .provider-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card-appear {
+            animation: cardAppear 0.8s ease-out forwards;
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Card Security Badge */
+        .security-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Card Glow Effect */
+        .card-glow {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #FFD700, #10B981, #FF8C00);
+            border-radius: 25px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(15px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            color: var(--success);
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .modal-message {
+            color: #94A3B8;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <div class="nav-icons">
+                    <div class="user-profile" id="userProfile">
+                        U
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Delevva Virtual Card</h1>
+                    <p>Your premium digital payment solution</p>
+                </div>
+            </div>
+
+            <!-- Card Creation Section -->
+            <div class="card-creation-section" id="cardCreationSection">
+                <div class="section-header">
+                    <h2>Create Your Virtual Card</h2>
+                    <button class="create-card-btn" id="createCardBtn">
+                        <span class="spinner" style="display: none;"></span>
+                        <span id="btnText">Generate Card</span>
+                    </button>
+                </div>
+                <p style="color: #94A3B8; margin-bottom: 0;">
+                    Create your exclusive Delevva virtual card with premium black, green, and gold design. 
+                    Use it for online purchases and enjoy exclusive rewards.
+                </p>
+            </div>
+
+            <!-- Card Display Section -->
+            <div class="card-display-section" id="cardDisplaySection">
+                <!-- Virtual Card -->
+                <div class="virtual-card-container" id="cardContainer">
+                    <div class="card-glow"></div>
+                    <div class="card-face card-front">
+                        <div class="security-badge">SECURE</div>
+                        <div class="card-header">
+                            <div class="card-logo">DELEVVA</div>
+                            <div class="card-type">Virtual</div>
+                        </div>
+                        
+                        <div class="card-chip"></div>
+                        
+                        <div class="card-number" id="cardNumber">
+                            •••• •••• •••• ••••
+                        </div>
+                        
+                        <div class="card-details">
+                            <div class="card-holder">
+                                <div class="card-label">Card Holder</div>
+                                <div class="card-value" id="cardHolder">YOUR NAME</div>
+                            </div>
+                            <div class="card-expiry">
+                                <div class="card-label">Expires</div>
+                                <div class="card-value" id="cardExpiry">MM/YY</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-face card-back">
+                        <div class="card-magnetic-strip"></div>
+                        <div class="card-signature" id="cardSignature">Authorized Signature</div>
+                        <div class="card-cvv" id="cardCvv">•••</div>
+                    </div>
+                </div>
+
+                <!-- Card Actions -->
+                <div class="card-actions">
+                    <div class="card-action-btn" onclick="flipCard()">
+                        <i class="fas fa-sync-alt card-action-icon"></i>
+                        <span class="card-action-text">Flip Card</span>
+                    </div>
+                    <div class="card-action-btn" onclick="copyCardNumber()">
+                        <i class="fas fa-copy card-action-icon"></i>
+                        <span class="card-action-text">Copy Details</span>
+                    </div>
+                    <div class="card-action-btn" onclick="freezeCard()">
+                        <i class="fas fa-snowflake card-action-icon"></i>
+                        <span class="card-action-text">Freeze Card</span>
+                    </div>
+                    <div class="card-action-btn" onclick="showCardDetails()">
+                        <i class="fas fa-info-circle card-action-icon"></i>
+                        <span class="card-action-text">Card Info</span>
+                    </div>
+                </div>
+
+                <!-- Card Statistics -->
+                <div class="card-stats">
+                    <div class="card-stat">
+                        <div class="stat-label">Card Balance</div>
+                        <div class="stat-value" id="cardBalance">0 FCFA</div>
+                        <div class="stat-note">Available funds</div>
+                    </div>
+                    <div class="card-stat">
+                        <div class="stat-label">DP Rewards</div>
+                        <div class="stat-value" id="cardRewards">0 DP</div>
+                        <div class="stat-note">Earned this month</div>
+                    </div>
+                    <div class="card-stat">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value" id="cardTransactions">0</div>
+                        <div class="stat-note">This month</div>
+                    </div>
+                    <div class="card-stat">
+                        <div class="stat-label">Card Status</div>
+                        <div class="stat-value" id="cardStatus">Active</div>
+                        <div class="stat-note" id="cardStatusNote">Ready to use</div>
+                    </div>
+                </div>
+
+                <!-- Top Up Section -->
+                <div class="topup-section">
+                    <div class="topup-header">
+                        <h2 class="topup-title">Top Up Card</h2>
+                        <button class="topup-toggle" id="topupToggle">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Funds</span>
+                        </button>
+                    </div>
+                    
+                    <div class="topup-form" id="topupForm">
+                        <!-- Amount Selection -->
+                        <div class="amount-selection">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 500;">Select Amount</label>
+                            <div class="amount-grid" id="amountGrid">
+                                <div class="amount-option" data-amount="1000">
+                                    <div class="amount-value">1,000 FCFA</div>
+                                    <div class="amount-label">Quick Top-up</div>
+                                </div>
+                                <div class="amount-option" data-amount="5000">
+                                    <div class="amount-value">5,000 FCFA</div>
+                                    <div class="amount-label">Popular</div>
+                                </div>
+                                <div class="amount-option" data-amount="10000">
+                                    <div class="amount-value">10,000 FCFA</div>
+                                    <div class="amount-label">Best Value</div>
+                                </div>
+                                <div class="amount-option" data-amount="20000">
+                                    <div class="amount-value">20,000 FCFA</div>
+                                    <div class="amount-label">Large Top-up</div>
+                                </div>
+                                <div class="amount-option" data-amount="50000">
+                                    <div class="amount-value">50,000 FCFA</div>
+                                    <div class="amount-label">Maximize</div>
+                                </div>
+                                <div class="amount-option" data-amount="custom">
+                                    <div class="amount-value">Custom</div>
+                                    <div class="amount-label">Any amount</div>
+                                </div>
+                            </div>
+                            <div class="custom-amount" id="customAmount" style="display: none;">
+                                <input type="number" class="custom-input" id="customAmountInput" placeholder="Enter amount in FCFA" min="100" max="100000">
+                            </div>
+                        </div>
+
+                        <!-- Provider Selection -->
+                        <div class="provider-selection">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 500;">Mobile Money Provider</label>
+                            <div class="provider-grid" id="providerGrid">
+                                <div class="provider-option" data-provider="mtn">
+                                    <i class="fas fa-sim-card provider-icon" style="color: #FFC107;"></i>
+                                    <div class="provider-name">MTN Mobile Money</div>
+                                </div>
+                                <div class="provider-option" data-provider="orange">
+                                    <i class="fas fa-sim-card provider-icon" style="color: #FF9800;"></i>
+                                    <div class="provider-name">Orange Money</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Up Summary -->
+                        <div class="topup-summary" id="topupSummary" style="display: none;">
+                            <div class="summary-item">
+                                <span>Amount:</span>
+                                <span id="summaryAmount">0 FCFA</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Fee:</span>
+                                <span id="summaryFee">0 FCFA</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Total:</span>
+                                <span id="summaryTotal">0 FCFA</span>
+                            </div>
+                        </div>
+
+                        <!-- Top Up Button -->
+                        <button class="topup-btn" id="topupBtn" disabled>
+                            <span class="spinner" style="display: none;"></span>
+                            <span id="topupBtnText">Top Up Card</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card Features -->
+                <div class="card-features">
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <div class="feature-title">Secure</div>
+                        <div class="feature-desc">Bank-level security</div>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-bolt feature-icon"></i>
+                        <div class="feature-title">Instant</div>
+                        <div class="feature-desc">Immediate activation</div>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-globe feature-icon"></i>
+                        <div class="feature-title">Cameroon</div>
+                        <div class="feature-desc">Use in Delevva</div>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-gift feature-icon"></i>
+                        <div class="feature-title">Rewards</div>
+                        <div class="feature-desc">Earn DP points</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="modal-title">Top Up Successful!</h2>
+            </div>
+            <p class="modal-message" id="successMessage">
+                Your virtual card has been topped up successfully. The funds are now available for use.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn btn-secondary" onclick="closeModal()">View Card</button>
+                <button class="modal-btn btn-primary" onclick="closeModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="services.html" class="nav-item">
+            <i class="fas fa-shipping-fast"></i>
+            <span>Services</span>
+        </a>
+        <a href="virtual-card.html" class="nav-item active">
+            <i class="fas fa-credit-card"></i>
+            <span>Card</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables
+        let userCard = null;
+        let isCardFlipped = false;
+        let selectedAmount = 0;
+        let selectedProvider = '';
+        let isCustomAmount = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVirtualCard();
+        });
+
+        async function initializeVirtualCard() {
+            // Check authentication
+            await checkAuth();
+            
+            // Check if user already has a card
+            await checkExistingCard();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // Card creation
+            document.getElementById('createCardBtn').addEventListener('click', createVirtualCard);
+            
+            // Top up toggle
+            document.getElementById('topupToggle').addEventListener('click', toggleTopupForm);
+            
+            // Amount selection
+            document.querySelectorAll('.amount-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectAmount(this);
+                });
+            });
+            
+            // Custom amount input
+            document.getElementById('customAmountInput').addEventListener('input', function() {
+                handleCustomAmount(this.value);
+            });
+            
+            // Provider selection
+            document.querySelectorAll('.provider-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectProvider(this);
+                });
+            });
+            
+            // Top up button
+            document.getElementById('topupBtn').addEventListener('click', processTopup);
+        }
+
+        async function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Set user info
+            document.getElementById('userProfile').textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        async function checkExistingCard() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            try {
+                // Check if card exists in database
+                const { data: card, error } = await supabaseClient
+                    .from('virtual_cards')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                if (card) {
+                    userCard = card;
+                    displayCard(card);
+                }
+            } catch (error) {
+                console.error('Error checking for existing card:', error);
+            }
+        }
+
+        async function createVirtualCard() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            const createBtn = document.getElementById('createCardBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = createBtn.querySelector('.spinner');
+
+            // Show loading state
+            createBtn.disabled = true;
+            btnText.textContent = 'Generating...';
+            spinner.style.display = 'inline-block';
+            createBtn.classList.add('loading');
+
+            try {
+                // Generate card details
+                const cardDetails = generateCardDetails(user.name);
+                
+                // Save to database
+                const { data: card, error } = await supabaseClient
+                    .from('virtual_cards')
+                    .insert([{
+                        user_id: user.id,
+                        card_number: cardDetails.number,
+                        expiry_date: cardDetails.expiry,
+                        cvv: cardDetails.cvv,
+                        card_holder: cardDetails.holder,
+                        balance: 0,
+                        is_active: true,
+                        created_at: new Date().toISOString()
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                userCard = card;
+                
+                // Display the card with animation
+                displayCard(card);
+                
+                // Show success message
+                showNotification('Virtual card created successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error creating virtual card:', error);
+                showNotification('Error creating card. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                createBtn.disabled = false;
+                btnText.textContent = 'Generate Card';
+                spinner.style.display = 'none';
+                createBtn.classList.remove('loading');
+            }
+        }
+
+        function generateCardDetails(userName) {
+            // Generate random card number (format: 4532 XXXX XXXX XXXX)
+            const generateCardNumber = () => {
+                const parts = [
+                    '4532',
+                    Math.floor(1000 + Math.random() * 9000).toString(),
+                    Math.floor(1000 + Math.random() * 9000).toString(),
+                    Math.floor(1000 + Math.random() * 9000).toString()
+                ];
+                return parts.join(' ');
+            };
+
+            // Generate expiry date (3 years from now)
+            const now = new Date();
+            const expiry = new Date(now.getFullYear() + 3, now.getMonth());
+            const expiryFormatted = `${String(expiry.getMonth() + 1).padStart(2, '0')}/${String(expiry.getFullYear()).slice(-2)}`;
+
+            // Generate CVV
+            const cvv = Math.floor(100 + Math.random() * 900).toString();
+
+            return {
+                number: generateCardNumber(),
+                expiry: expiryFormatted,
+                cvv: cvv,
+                holder: userName.toUpperCase()
+            };
+        }
+
+        function displayCard(card) {
+            // Show card display section
+            document.getElementById('cardDisplaySection').classList.add('active');
+            document.getElementById('cardCreationSection').style.display = 'none';
+
+            // Update card details
+            document.getElementById('cardNumber').textContent = card.card_number;
+            document.getElementById('cardHolder').textContent = card.card_holder;
+            document.getElementById('cardExpiry').textContent = card.expiry_date;
+            document.getElementById('cardCvv').textContent = card.cvv;
+            document.getElementById('cardSignature').textContent = card.card_holder;
+
+            // Update stats
+            updateCardStats(card);
+
+            // Add appearance animation
+            const cardElement = document.querySelector('.virtual-card-container');
+            cardElement.classList.add('card-appear');
+        }
+
+        function updateCardStats(card) {
+            document.getElementById('cardBalance').textContent = `${card.balance || 0} FCFA`;
+            document.getElementById('cardRewards').textContent = `${Math.floor((card.balance || 0) * 0.1)} DP`;
+            document.getElementById('cardTransactions').textContent = '0';
+            document.getElementById('cardStatus').textContent = card.is_active ? 'Active' : 'Inactive';
+            document.getElementById('cardStatusNote').textContent = card.is_active ? 'Ready to use' : 'Card frozen';
+        }
+
+        function toggleTopupForm() {
+            const form = document.getElementById('topupForm');
+            const toggle = document.getElementById('topupToggle');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                toggle.innerHTML = '<i class="fas fa-plus"></i><span>Add Funds</span>';
+            } else {
+                form.classList.add('active');
+                toggle.innerHTML = '<i class="fas fa-minus"></i><span>Hide</span>';
+                resetTopupForm();
+            }
+        }
+
+        function resetTopupForm() {
+            // Reset selections
+            selectedAmount = 0;
+            selectedProvider = '';
+            isCustomAmount = false;
+            
+            // Reset UI
+            document.querySelectorAll('.amount-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('.provider-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.getElementById('customAmount').style.display = 'none';
+            document.getElementById('customAmountInput').value = '';
+            document.getElementById('topupSummary').style.display = 'none';
+            document.getElementById('topupBtn').disabled = true;
+        }
+
+        function selectAmount(element) {
+            // Remove selection from all amount options
+            document.querySelectorAll('.amount-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            const amount = element.dataset.amount;
+            
+            if (amount === 'custom') {
+                isCustomAmount = true;
+                document.getElementById('customAmount').style.display = 'block';
+                document.getElementById('customAmountInput').focus();
+            } else {
+                isCustomAmount = false;
+                document.getElementById('customAmount').style.display = 'none';
+                selectedAmount = parseInt(amount);
+                updateTopupSummary();
+            }
+            
+            checkTopupReady();
+        }
+
+        function handleCustomAmount(value) {
+            const amount = parseInt(value) || 0;
+            
+            if (amount >= 100 && amount <= 100000) {
+                selectedAmount = amount;
+                updateTopupSummary();
+            } else {
+                selectedAmount = 0;
+                document.getElementById('topupSummary').style.display = 'none';
+            }
+            
+            checkTopupReady();
+        }
+
+        function selectProvider(element) {
+            // Remove selection from all provider options
+            document.querySelectorAll('.provider-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            selectedProvider = element.dataset.provider;
+            
+            checkTopupReady();
+        }
+
+        function checkTopupReady() {
+            const isReady = selectedAmount > 0 && selectedProvider !== '';
+            document.getElementById('topupBtn').disabled = !isReady;
+        }
+
+        function updateTopupSummary() {
+            const fee = calculateFee(selectedAmount);
+            const total = selectedAmount + fee;
+            
+            document.getElementById('summaryAmount').textContent = `${selectedAmount.toLocaleString()} FCFA`;
+            document.getElementById('summaryFee').textContent = `${fee.toLocaleString()} FCFA`;
+            document.getElementById('summaryTotal').textContent = `${total.toLocaleString()} FCFA`;
+            document.getElementById('topupSummary').style.display = 'block';
+        }
+
+        function calculateFee(amount) {
+            // Fee structure: 1.5% of amount with minimum 50 FCFA and maximum 500 FCFA
+            const percentageFee = amount * 0.015;
+            return Math.min(Math.max(percentageFee, 50), 500);
+        }
+
+        async function processTopup() {
+            if (!userCard) {
+                showNotification('Please create a card first', 'error');
+                return;
+            }
+
+            const topupBtn = document.getElementById('topupBtn');
+            const btnText = document.getElementById('topupBtnText');
+            const spinner = topupBtn.querySelector('.spinner');
+
+            // Show loading state
+            topupBtn.disabled = true;
+            btnText.textContent = 'Processing...';
+            spinner.style.display = 'inline-block';
+            topupBtn.classList.add('loading');
+
+            try {
+                // Simulate mobile money payment processing
+                await simulateMobileMoneyPayment();
+                
+                // Update card balance in database
+                const newBalance = (userCard.balance || 0) + selectedAmount;
+                const { error } = await supabaseClient
+                    .from('virtual_cards')
+                    .update({ 
+                        balance: newBalance,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', userCard.id);
+
+                if (error) throw error;
+
+                // Update local card object
+                userCard.balance = newBalance;
+                
+                // Update UI
+                updateCardStats(userCard);
+                
+                // Show success modal
+                showSuccessModal(selectedAmount);
+                
+                // Reset form
+                resetTopupForm();
+                document.getElementById('topupForm').classList.remove('active');
+                document.getElementById('topupToggle').innerHTML = '<i class="fas fa-plus"></i><span>Add Funds</span>';
+                
+            } catch (error) {
+                console.error('Error processing top-up:', error);
+                showNotification('Error processing top-up. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                topupBtn.disabled = false;
+                btnText.textContent = 'Top Up Card';
+                spinner.style.display = 'none';
+                topupBtn.classList.remove('loading');
+            }
+        }
+
+        function simulateMobileMoneyPayment() {
+            return new Promise((resolve) => {
+                // Simulate API call to mobile money provider
+                setTimeout(() => {
+                    resolve(true);
+                }, 2000);
+            });
+        }
+
+        function showSuccessModal(amount) {
+            document.getElementById('successMessage').textContent = 
+                `Your virtual card has been topped up with ${amount.toLocaleString()} FCFA successfully. The funds are now available for use.`;
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        function flipCard() {
+            const container = document.getElementById('cardContainer');
+            isCardFlipped = !isCardFlipped;
+            
+            if (isCardFlipped) {
+                container.classList.add('flipped');
+            } else {
+                container.classList.remove('flipped');
+            }
+        }
+
+        function copyCardNumber() {
+            if (!userCard) return;
+            
+            navigator.clipboard.writeText(userCard.card_number.replace(/\s/g, '')).then(() => {
+                showNotification('Card number copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy card number', 'error');
+            });
+        }
+
+        async function freezeCard() {
+            if (!userCard) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('virtual_cards')
+                    .update({ 
+                        is_active: !userCard.is_active,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', userCard.id);
+
+                if (error) throw error;
+
+                userCard.is_active = !userCard.is_active;
+                
+                document.getElementById('cardStatus').textContent = userCard.is_active ? 'Active' : 'Frozen';
+                document.getElementById('cardStatusNote').textContent = userCard.is_active ? 'Ready to use' : 'Card frozen';
+
+                showNotification(`Card ${userCard.is_active ? 'activated' : 'frozen'} successfully!`, 'success');
+            } catch (error) {
+                console.error('Error updating card status:', error);
+                showNotification('Error updating card status', 'error');
+            }
+        }
+
+        function showCardDetails() {
+            if (!userCard) return;
+            
+            const details = `
+Card Number: ${userCard.card_number}
+Expiry Date: ${userCard.expiry_date}
+Card Holder: ${userCard.card_holder}
+Balance: ${userCard.balance || 0} FCFA
+Status: ${userCard.is_active ? 'Active' : 'Inactive'}
+Created: ${new Date(userCard.created_at).toLocaleDateString()}
+            `.trim();
+
+            alert('Card Details:\n\n' + details);
+        }
+
+        function showNotification(message, type) {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.custom-notification');
+            existingNotifications.forEach(notif => notif.remove());
+
+            const notification = document.createElement('div');
+            notification.className = 'custom-notification';
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 500;
+                box-shadow: var(--shadow);
+                z-index: 1001;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+                transition: transform 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(150%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

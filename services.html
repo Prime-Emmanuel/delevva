@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Premium Services</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF8C00',
+                        secondary: '#10B981',
+                        dark: '#0F172A',
+                        light: '#F8FAFC',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        heading: ['"Outfit"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5500 100%);
+        }
+
+        /* Animation Keyframes */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        
+        /* Staggered Animation Delays */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+        /* Card Hover Effects */
+        .service-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Loader */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FF8C00;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-orange-100 selection:text-orange-600">
+
+    <header class="fixed w-full top-0 z-50 glass transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="dashboard.html" class="flex items-center gap-3 group">
+                    <div class="bg-gradient-primary w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-105 transition-transform">
+                        <span class="text-white font-heading font-bold text-xl">D</span>
+                    </div>
+                    <div class="font-heading font-bold text-2xl tracking-tight">
+                        <span class="text-slate-900">DELE</span><span class="text-gradient">VVA</span>
+                    </div>
+                </a>
+
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="dashboard.html" class="flex flex-col items-center text-slate-500 hover:text-orange-600 transition-colors group">
+                        <i class="fas fa-home text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                        <span class="text-xs font-medium">Home</span>
+                    </a>
+                    
+                    <a href="services.html" class="flex flex-col items-center text-orange-600">
+                        <div class="relative">
+                            <i class="fas fa-grid-2 text-lg mb-1"></i>
+                            <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                            </span>
+                        </div>
+                        <span class="text-xs font-bold">Services</span>
+                    </a>
+                    
+                    <a href="orders.html" class="flex flex-col items-center text-slate-500 hover:text-orange-600 transition-colors group relative">
+                        <i class="fas fa-receipt text-lg mb-1 group-hover:-translate-y-1 transition-transform"></i>
+                        <span class="text-xs font-medium">Orders</span>
+                        <div id="orderBadgeDesktop" class="absolute -top-1 right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</div>
+                    </a>
+
+                    <div id="userInfoDesktop" class="pl-4 border-l border-slate-200">
+                        <div class="animate-pulse w-10 h-10 bg-slate-200 rounded-full"></div> 
+                        </div>
+                </nav>
+
+                <button id="mobileMenuBtn" class="md:hidden text-slate-700 hover:text-orange-600 focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobileMenu" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-slate-100">
+            <span class="font-heading font-bold text-xl text-slate-900">Menu</span>
+            <button id="closeMobileMenu" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="userInfoMobile" class="mb-8 p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                </div>
+            
+            <nav class="space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 text-slate-600">
+                    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-orange-500"><i class="fas fa-home"></i></div>
+                    <span class="font-medium">Dashboard</span>
+                </a>
+                <a href="services.html" class="flex items-center gap-4 p-4 rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/20">
+                    <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center text-white"><i class="fas fa-grid-2"></i></div>
+                    <span class="font-bold">Services</span>
+                </a>
+                <a href="orders.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 text-slate-600">
+                    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-blue-500"><i class="fas fa-receipt"></i></div>
+                    <span class="font-medium">My Orders</span>
+                    <span id="orderBadgeMobile" class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full hidden">0</span>
+                </a>
+                <a href="profile.html" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-50 text-slate-600">
+                    <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-500"><i class="fas fa-user-cog"></i></div>
+                    <span class="font-medium">Profile & Settings</span>
+                </a>
+            </nav>
+
+            <div id="authButtonsMobile" class="mt-8 pt-6 border-t border-slate-100">
+                </div>
+        </div>
+    </div>
+
+    <main class="pt-24 pb-24 lg:pb-12 px-4 lg:px-8 container mx-auto max-w-7xl">
+        
+        <div class="relative bg-white rounded-3xl p-6 lg:p-12 mb-12 shadow-sm border border-slate-100 overflow-hidden animate-fade-in">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-2xl mx-auto text-center">
+                <h1 class="font-heading font-extrabold text-3xl lg:text-5xl text-slate-900 mb-4 leading-tight">
+                    What can we get for you <br/>
+                    <span class="text-gradient">today?</span>
+                </h1>
+                <p class="text-slate-500 text-lg mb-8">From pharmacy needs to fresh pastries, we deliver it all in minutes.</p>
+
+                <div class="relative group max-w-xl mx-auto">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-slate-400 group-focus-within:text-orange-500 transition-colors"></i>
+                    </div>
+                    <input type="text" 
+                           class="block w-full pl-11 pr-14 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 shadow-sm transition-all text-base" 
+                           placeholder="Search services, items, or stores...">
+                    <button class="absolute inset-y-2 right-2 px-4 bg-slate-100 hover:bg-orange-100 text-slate-600 hover:text-orange-600 rounded-xl transition-colors">
+                        <i class="fas fa-sliders-h"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2 mt-6">
+                    <button class="px-4 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-full hover:bg-orange-100 transition-colors">🔥 Popular</button>
+                    <button class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-full hover:border-orange-300 hover:text-orange-600 transition-colors">Fastest Delivery</button>
+                    <button class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded-full hover:border-orange-300 hover:text-orange-600 transition-colors">Deals</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12 animate-fade-in delay-100">
+            
+            <div class="relative rounded-3xl overflow-hidden bg-gradient-primary text-white p-8 shadow-lg shadow-orange-500/20 group cursor-pointer" onclick="handlePromoClick()">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div>
+                        <div class="inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-bold mb-4">NEW USER OFFER</div>
+                        <h3 class="font-heading font-bold text-3xl mb-2">30% OFF First Order</h3>
+                        <p class="text-orange-100 mb-6 max-w-xs">Use code <span class="font-mono bg-white text-orange-600 px-2 py-0.5 rounded font-bold mx-1">DEL30</span> at checkout.</p>
+                    </div>
+                    <button class="w-max bg-white text-orange-600 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center gap-2 group-hover:gap-3">
+                        Claim Offer <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+                <div class="absolute bottom-4 right-4 text-white/10 text-9xl">
+                    <i class="fas fa-gift transform rotate-12"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative overflow-hidden group hover:border-blue-200 transition-all cursor-pointer" onclick="handleServiceClick('monthly-subscription')">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">PREMIUM</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-2xl text-slate-900">Delevva Plus</h3>
+                        <p class="text-slate-500 mt-1">Unlimited Free Deliveries</p>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div class="flex items-end justify-between mt-auto">
+                    <div>
+                        <span class="text-3xl font-heading font-bold text-slate-900">10k</span>
+                        <span class="text-slate-500 font-medium">FCFA / mo</span>
+                    </div>
+                    <button class="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-slate-800 transition-colors">Subscribe</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8 flex items-end justify-between animate-fade-in delay-200">
+            <div>
+                <h2 class="font-heading font-bold text-2xl text-slate-900">Categories</h2>
+                <p class="text-slate-500 text-sm mt-1">Select a service to get started</p>
+            </div>
+            <a href="#" class="text-orange-600 font-semibold text-sm hover:text-orange-700">View All</a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in delay-300">
+            
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('pharmacy')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-emerald-600 flex items-center gap-1">
+                        <i class="fas fa-clock"></i> 30m
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Pharmacy</h3>
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Medications and health products delivered safely.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">1,500 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('restaurant')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-orange-600 flex items-center gap-1">
+                        <i class="fas fa-fire"></i> Hot
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Food</h3>
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-sm">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Delicious meals from your favorite local spots.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">3,500 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('grocery')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Grocery</h3>
+                        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-sm">
+                            <i class="fas fa-shopping-basket"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Fresh produce & essentials from markets.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">2,500 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('boulangerie')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Bakery</h3>
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 text-sm">
+                            <i class="fas fa-bread-slice"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Fresh bread, pastries & cakes.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">800 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-slate-900 rounded-2xl overflow-hidden shadow-lg group cursor-pointer" onclick="handleServiceClick('express-delivery')">
+                <div class="h-full p-6 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center mb-4 shadow-lg shadow-orange-500/40">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="font-heading font-bold text-lg text-white mb-2">Express Delivery</h3>
+                        <p class="text-slate-400 text-sm mb-4">Urgent package? We deliver within 30 minutes.</p>
+                    </div>
+                    
+                    <div class="relative z-10 flex items-center justify-between mt-4">
+                        <span class="font-bold text-orange-400">+500 FCFA</span>
+                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-white/20 transition-colors">
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('assistance-document')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Doc Assist</h3>
+                        <div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 text-sm">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Typing & organizing documents for you.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">1,500 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('phone-services')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Tech Repair</h3>
+                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-sm">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Expert repair for phones & tablets.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">7,000 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="service-card bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm group cursor-pointer" onclick="handleServiceClick('home-services')">
+                <div class="h-40 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-heading font-bold text-lg text-slate-900 group-hover:text-orange-600 transition-colors">Home Care</h3>
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-4 line-clamp-2">Cleaning, plumbing & maintenance.</p>
+                    <div class="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <span class="text-xs text-slate-400">Starting from</span>
+                        <span class="font-bold text-slate-900">5,000 FCFA</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 z-40 md:hidden pb-safe">
+        <div class="flex justify-around items-center h-16">
+            <a href="dashboard.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-orange-600">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a href="services.html" class="flex flex-col items-center justify-center w-full h-full text-orange-600">
+                <i class="fas fa-grid-2 text-lg mb-1"></i>
+                <span class="text-[10px] font-bold">Services</span>
+            </a>
+            <div class="relative -top-5">
+                <a href="dashboard.html" class="bg-gradient-primary w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/40 transform hover:scale-105 transition-transform">
+                    <i class="fas fa-plus text-xl"></i>
+                </a>
+            </div>
+            <a href="orders.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-orange-600 relative">
+                <i class="fas fa-receipt text-lg mb-1"></i>
+                <span class="text-[10px] font-medium">Orders</span>
+                <span id="orderBadgeBottom" class="absolute top-3 right-5 bg-red-500 w-2 h-2 rounded-full hidden"></span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-orange-600">
+                <i class="fas fa-user text-lg mb-1"></i>
+                <span class="text-[10px] font-medium">Account</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="serviceModal" class="fixed inset-0 z-[60] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalPanel">
+                    
+                    <button onclick="closeServiceModal()" class="absolute top-4 right-4 z-10 bg-white/50 backdrop-blur-md hover:bg-white rounded-full p-2 text-slate-500 hover:text-slate-800 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+
+                    <div class="h-56 w-full relative">
+                        <img id="modalImage" src="" alt="Service" class="h-full w-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-4 left-6">
+                            <h3 id="modalTitle" class="text-2xl font-heading font-bold text-white"></h3>
+                            <div class="flex items-center gap-4 mt-2 text-white/90 text-sm">
+                                <span class="flex items-center gap-1"><i class="fas fa-clock"></i> <span id="modalDeliveryTime"></span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-6">
+                        <p id="modalDescription" class="text-slate-600 text-base leading-relaxed mb-6"></p>
+                        
+                        <div class="bg-slate-50 rounded-xl p-4 space-y-3 mb-8 border border-slate-100">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-500 text-sm">Base Price</span>
+                                <span id="modalPrice" class="font-bold text-slate-900"></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-500 text-sm">Delivery Fee</span>
+                                <span id="modalFee" class="font-medium text-slate-700"></span>
+                            </div>
+                        </div>
+
+                        <button id="orderServiceButton" class="w-full bg-gradient-primary text-white font-bold text-lg py-4 rounded-xl hover:shadow-lg hover:shadow-orange-500/30 transition-all transform active:scale-[0.98]">
+                            Proceed to Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+        
+        let supabaseClient;
+        let currentService = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Supabase
+            if (typeof supabase !== 'undefined') {
+                const { createClient } = supabase;
+                supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.error("Supabase SDK not loaded");
+            }
+
+            // UI Initializations
+            setupMobileMenu();
+            await checkAuthAndLoadData();
+            setupNavbarScroll();
+        });
+
+        /* --- Auth & User Data Logic --- */
+        async function checkAuthAndLoadData() {
+            const storedUser = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!storedUser || !storedUser.isLoggedIn) {
+                renderGuestState();
+            } else {
+                if (supabaseClient) {
+                    await fetchUserProfile(storedUser.id);
+                } else {
+                    renderUserState(storedUser.name || 'User', 'Member', 0); // Fallback
+                }
+            }
+        }
+
+        function renderGuestState() {
+            // Desktop
+            const desktopProfile = document.getElementById('userInfoDesktop');
+            desktopProfile.innerHTML = `
+                <a href="index.html" class="flex items-center gap-2 group cursor-pointer">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="text-right hidden xl:block">
+                        <p class="text-xs text-slate-400">Welcome</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-orange-600">Sign In</p>
+                    </div>
+                </a>
+            `;
+
+            // Mobile
+            const mobileProfile = document.getElementById('userInfoMobile');
+            mobileProfile.className = "mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-200";
+            mobileProfile.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                        <i class="fas fa-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">Guest User</h3>
+                        <p class="text-slate-500 text-sm">Please sign in to order</p>
+                    </div>
+                </div>
+            `;
+
+            // Mobile Auth Buttons
+            document.getElementById('authButtonsMobile').innerHTML = `
+                <a href="index.html" class="block w-full text-center bg-slate-900 text-white font-bold py-3 rounded-xl mb-3">Login / Register</a>
+            `;
+        }
+
+        async function fetchUserProfile(userId) {
+            try {
+                // Fetch Profile
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name, delevva_points, loyalty_tier')
+                    .eq('id', userId)
+                    .single();
+
+                // Fetch Orders count
+                const { count } = await supabaseClient
+                    .from('orders')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId)
+                    .eq('status', 'active');
+
+                const name = profile?.full_name || 'User';
+                const tier = profile?.loyalty_tier || 'Bronze';
+                
+                renderUserState(name, tier, count || 0);
+
+            } catch (err) {
+                console.error("Error loading user data:", err);
+                const localUser = JSON.parse(localStorage.getItem('delevva_user'));
+                renderUserState(localUser.name, 'Member', 0);
+            }
+        }
+
+        function renderUserState(name, tier, ordersCount) {
+            const initials = name.charAt(0).toUpperCase();
+            
+            // Desktop
+            document.getElementById('userInfoDesktop').innerHTML = `
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="text-right hidden xl:block">
+                        <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">${tier} Member</p>
+                        <p class="text-sm font-bold text-slate-900 truncate max-w-[100px]">${name}</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold shadow-md ring-2 ring-white">
+                        ${initials}
+                    </div>
+                </div>
+            `;
+
+            // Mobile
+            document.getElementById('userInfoMobile').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            ${initials}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">${name}</h3>
+                            <span class="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-[10px] font-bold rounded uppercase tracking-wider">${tier}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Badges
+            if (ordersCount > 0) {
+                const badgeTxt = ordersCount > 9 ? '9+' : ordersCount;
+                ['orderBadgeDesktop', 'orderBadgeMobile'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.innerText = badgeTxt;
+                        el.classList.remove('hidden');
+                    }
+                });
+                document.getElementById('orderBadgeBottom').classList.remove('hidden');
+            }
+
+            // Mobile Auth Buttons (Logout)
+            document.getElementById('authButtonsMobile').innerHTML = `
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 font-bold py-3 rounded-xl hover:bg-red-100 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </button>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('delevva_user');
+            window.location.href = 'index.html';
+        }
+
+        /* --- UI Interaction Logic --- */
+        function setupMobileMenu() {
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const closeBtn = document.getElementById('closeMobileMenu');
+            const menu = document.getElementById('mobileMenu');
+
+            function toggleMenu() {
+                const isClosed = menu.classList.contains('translate-x-full');
+                if (isClosed) {
+                    menu.classList.remove('translate-x-full');
+                    document.body.style.overflow = 'hidden'; // Prevent scroll
+                } else {
+                    menu.classList.add('translate-x-full');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            menuBtn.addEventListener('click', toggleMenu);
+            closeBtn.addEventListener('click', toggleMenu);
+        }
+
+        function setupNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('shadow-sm');
+                } else {
+                    navbar.classList.remove('shadow-sm');
+                }
+            });
+        }
+
+        /* --- Modal & Services Logic --- */
+        const servicesData = {
+            'pharmacy': {
+                title: 'Pharmacy',
+                desc: 'Get your prescription medications, over-the-counter drugs, and health products delivered safely to your doorstep.',
+                time: '30-60 min',
+                price: '1,500 FCFA',
+                fee: '300 FCFA',
+                img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800',
+                url: 'pharmacy.html'
+            },
+            'restaurant': {
+                title: 'Restaurant Delivery',
+                desc: 'Delicious meals from your favorite restaurants, cafes and fast food chains delivered hot and fresh.',
+                time: '25-50 min',
+                price: '3,500 FCFA',
+                fee: '600 FCFA',
+                img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800',
+                url: 'restaurant.html'
+            },
+            'grocery': {
+                title: 'Grocery',
+                desc: 'Fresh fruits, vegetables, dairy products, meats, and daily essentials from trusted local markets.',
+                time: '45-90 min',
+                price: '2,500 FCFA',
+                fee: '500 FCFA',
+                img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800',
+                url: 'grocery.html'
+            },
+            'boulangerie': {
+                title: 'Boulangerie',
+                desc: 'Freshly baked bread, croissants, pastries, cakes and other bakery products.',
+                time: '20-40 min',
+                price: '800 FCFA',
+                fee: '200 FCFA',
+                img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800',
+                url: 'boulangerie.html'
+            },
+            'express-delivery': {
+                title: 'Express Delivery',
+                desc: 'Super-fast delivery service for urgent needs. Priority handling ensured.',
+                time: '< 30 min',
+                price: '+500 FCFA',
+                fee: 'Premium Fee',
+                img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800',
+                url: 'express-delivery.html'
+            },
+            'assistance-document': {
+                title: 'Document Assistance',
+                desc: 'Professional typing, organization, and printing of documents delivered to you.',
+                time: 'Variable',
+                price: '1,500 FCFA',
+                fee: '500 FCFA',
+                img: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800',
+                url: 'document.html'
+            },
+            'phone-services': {
+                title: 'Phone Repair',
+                desc: 'Screen replacement, battery change, and software issues handled by experts.',
+                time: 'Same Day',
+                price: '7,000 FCFA',
+                fee: 'Diagnosis: 1k',
+                img: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800',
+                url: 'phone-services.html'
+            },
+            'home-services': {
+                title: 'Home Services',
+                desc: 'Professional cleaning, plumbing, and electrical repairs.',
+                time: 'By Appointment',
+                price: '5,000 FCFA',
+                fee: 'Varies',
+                img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800',
+                url: 'home-services.html'
+            },
+            'monthly-subscription': {
+                title: 'Delevva Plus',
+                desc: 'Unlimited free deliveries on all orders above 5,000 FCFA.',
+                time: 'Instant Active',
+                price: '10,000 FCFA/mo',
+                fee: '0 FCFA',
+                img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800',
+                url: 'subscription.html'
+            }
+        };
+
+        window.handleServiceClick = function(key) {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            if (!user || !user.isLoggedIn) {
+                alert('Please login to access our premium services.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const service = servicesData[key];
+            if (!service) return;
+
+            currentService = service;
+
+            // Populate Modal
+            document.getElementById('modalTitle').innerText = service.title;
+            document.getElementById('modalDescription').innerText = service.desc;
+            document.getElementById('modalDeliveryTime').innerText = service.time;
+            document.getElementById('modalPrice').innerText = service.price;
+            document.getElementById('modalFee').innerText = service.fee;
+            document.getElementById('modalImage').src = service.img;
+
+            // Show Modal with Animation
+            const modal = document.getElementById('serviceModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const panel = document.getElementById('modalPanel');
+            
+            modal.classList.remove('hidden');
+            
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+            }, 10);
+        }
+
+        window.closeServiceModal = function() {
+            const modal = document.getElementById('serviceModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const panel = document.getElementById('modalPanel');
+
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+            panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentService = null;
+            }, 300); // Wait for transition
+        }
+
+        document.getElementById('orderServiceButton').addEventListener('click', () => {
+            if (currentService) window.location.href = currentService.url;
+        });
+        
+        window.handlePromoClick = function() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            if (!user || !user.isLoggedIn) {
+                window.location.href = 'index.html';
+                return;
+            }
+            alert("Promo code DEL30 applied!");
+        }
+
+        // Close modal on click outside
+        document.getElementById('serviceModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('serviceModal')) closeServiceModal();
+        });
+    </script>
+</body>
+</html>

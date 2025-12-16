@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | VIP Premium Packs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --sky-blue: #E0F2FE;
+            --dark-bg: #0F172A;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            --vip-purple: #8A2BE2;
+            --vip-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            --vip-silver: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+            --vip-bronze: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #F0FDF4 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-right: 15px;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--dark);
+            transition: var(--transition);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: var(--transition);
+            padding: 80px 30px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .mobile-nav-links li {
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .mobile-auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* VIP Hero Section */
+        .vip-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 180px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vip-hero::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .vip-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .vip-hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .vip-hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .vip-hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .vip-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* VIP Packs Section */
+        .vip-packs {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .packs-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pack-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 350px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pack-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .pack-card.popular {
+            transform: scale(1.05);
+            border: 3px solid var(--primary);
+        }
+
+        .pack-card.popular:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .pack-popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .pack-header {
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pack-basic .pack-header {
+            background: linear-gradient(135deg, var(--bronze) 0%, #8B4513 100%);
+            color: white;
+        }
+
+        .pack-pro .pack-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .pack-premium .pack-header {
+            background: linear-gradient(135deg, var(--vip-purple) 0%, #4B0082 100%);
+            color: white;
+        }
+
+        .pack-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+        }
+
+        .pack-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .pack-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .pack-period {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .pack-features {
+            padding: 30px;
+        }
+
+        .pack-features ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .pack-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .pack-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pack-features i {
+            margin-right: 10px;
+            color: var(--success);
+            font-size: 14px;
+        }
+
+        .pack-features .disabled {
+            color: var(--gray);
+        }
+
+        .pack-features .disabled i {
+            color: var(--gray);
+        }
+
+        .pack-actions {
+            padding: 0 30px 30px;
+        }
+
+        .btn-pack {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-basic {
+            background: var(--bronze);
+            color: white;
+        }
+
+        .btn-basic:hover {
+            background: #8B4513;
+        }
+
+        .btn-pro {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-pro:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--vip-purple) 0%, #4B0082 100%);
+            color: white;
+        }
+
+        .btn-premium:hover {
+            background: linear-gradient(135deg, #7B1FA2 0%, #4A148C 100%);
+        }
+
+        .btn-more {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-top: 10px;
+        }
+
+        .btn-more:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* DP Purchase Section */
+        .dp-purchase {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .dp-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .dp-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 30px 20px;
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dp-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .dp-card.popular {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .dp-card.popular:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        
+        .dp-popular-badge {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 3px 10px rgba(255, 140, 0, 0.3);
+        }
+        
+        .dp-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .dp-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .dp-price {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .dp-bonus {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .dp-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        
+        .btn-dp {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .btn-dp:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+        }
+
+        /* VIP Benefits Section */
+        .vip-benefits {
+            background: linear-gradient(135deg, #FFF8F0 0%, #F0FDF4 100%);
+            padding: 100px 0;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .benefit-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: var(--primary);
+            font-size: 30px;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .benefit-card p {
+            color: var(--gray);
+        }
+
+        /* VIP Testimonials */
+        .vip-testimonials {
+            padding: 100px 0;
+        }
+
+        .testimonials-slider {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonials-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .testimonial-card {
+            min-width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--primary);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--gray);
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .testimonial-role {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .slider-dot.active {
+            background: var(--primary);
+        }
+
+        /* VIP FAQ Section */
+        .vip-faq {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .faq-question {
+            padding: 20px 30px;
+            background: var(--light);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background: #f0f0f0;
+        }
+
+        .faq-question i {
+            transition: var(--transition);
+        }
+
+        .faq-answer {
+            padding: 0 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 20px 30px;
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        /* VIP CTA Section */
+        .vip-cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .vip-cta h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .vip-cta p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--primary);
+            padding: 15px 40px;
+            font-size: 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .btn-cta:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #b2b2b2;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b2b2b2;
+            font-size: 14px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 12px;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .modal-header {
+            padding: 40px 40px 20px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            text-align: center;
+        }
+
+        .modal-basic .modal-header {
+            background: linear-gradient(135deg, var(--bronze) 0%, #8B4513 100%);
+            color: white;
+        }
+
+        .modal-pro .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .modal-premium .modal-header {
+            background: linear-gradient(135deg, var(--vip-purple) 0%, #4B0082 100%);
+            color: white;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .modal-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .modal-body {
+            padding: 30px 40px;
+        }
+
+        .modal-features {
+            margin-bottom: 30px;
+        }
+
+        .modal-features h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-features ul {
+            list-style: none;
+        }
+
+        .modal-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-features li:last-child {
+            border-bottom: none;
+        }
+
+        .modal-features i {
+            margin-right: 10px;
+            color: var(--success);
+            font-size: 14px;
+        }
+
+        .modal-features .disabled {
+            color: var(--gray);
+        }
+
+        .modal-features .disabled i {
+            color: var(--gray);
+        }
+
+        .modal-footer {
+            padding: 20px 40px 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 15px;
+            font-size: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+       /* Payment Modal Size Fix */
+.payment-modal .modal-content {
+    max-width: 500px;
+    max-height: 85vh; /* Changed from 90vh to 85vh */
+    overflow-y: auto; /* Ensure content scrolls if needed */
+    margin: 20px; /* Add margin for smaller screens */
+}
+
+/* Make modal body more compact */
+.payment-modal .modal-body {
+    padding: 20px 30px; /* Reduced padding */
+}
+
+.payment-modal .modal-header {
+    padding: 30px 30px 20px; /* Reduced padding */
+}
+
+/* Make instructions more compact */
+.payment-instructions {
+    padding: 20px; /* Reduced padding */
+    margin: 20px 0; /* Reduced margin */
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .payment-modal .modal-content {
+        max-height: 90vh;
+        margin: 10px;
+    }
+    
+    .payment-modal .modal-header,
+    .payment-modal .modal-body {
+        padding: 20px;
+    }
+}
+
+        .payment-success-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 40px;
+            color: white;
+        }
+
+        .payment-modal .modal-title {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .payment-modal .modal-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .payment-instructions {
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .payment-instructions h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .payment-instructions p {
+            margin-bottom: 15px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .payment-instructions .highlight {
+            background: rgba(255, 140, 0, 0.15);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            margin: 15px 0;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 200px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .user-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .user-dropdown-item:hover {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes successCheckmark {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .success-checkmark {
+            animation: successCheckmark 0.6s ease forwards;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .vip-hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .pack-card.popular {
+                transform: scale(1);
+            }
+            
+            .pack-card.popular:hover {
+                transform: translateY(-10px);
+            }
+            
+            .dp-card.popular {
+                transform: scale(1);
+            }
+            
+            .dp-card.popular:hover {
+                transform: translateY(-5px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .auth-buttons {
+                display: none;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .vip-hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .payment-actions {
+                flex-direction: column;
+            }
+            
+            .dp-container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .vip-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .vip-hero p {
+                font-size: 1rem;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-header, .modal-body, .modal-footer {
+                padding: 20px;
+            }
+            
+            .dp-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .bottom-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="home.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+                    <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+                    <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+                    <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                     <li><a href="vip.html"><i class="fas fa-star"></i> Vip</a></li>
+                      <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+                       <li><a href="blog.html"><i class="fas fa-book"></i> Blog</a></li>
+                        <li><a href="partner.html"><i class="fas fa-building"></i> Partnership</a></li>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                </ul>
+                
+                <div class="nav-icons">
+                    <div class="nav-icon cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge">0</span>
+                    </div>
+                    
+                    <div class="user-profile" id="userProfile">
+                        <!-- User initials will be inserted here -->
+                    </div>
+                    
+                    <div class="hamburger" id="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                
+                <div class="auth-buttons" id="authButtons">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- User Dropdown -->
+        <div class="user-dropdown" id="userDropdown">
+            <a href="profile.html" class="user-dropdown-item" id="userNameItem">
+                <i class="fas fa-user"></i>
+                <span id="dropdownUserName">User</span>
+            </a>
+            <a href="dashboard.html" class="user-dropdown-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="orders.html" class="user-dropdown-item">
+                <i class="fas fa-history"></i>
+                <span>Order History</span>
+            </a>
+            <div class="user-dropdown-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <ul class="mobile-nav-links">
+           <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="services.html"><i class="fas fa-shopping-cart"></i> Services</a></li>
+                    <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
+                    <li><a href="rewards.html"><i class="fas fa-gift"></i> Rewards</a></li>
+                    <li><a href="promotions.html"><i class="fas fa-tags"></i> Promotions</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                     <li><a href="vip.html"><i class="fas fa-star"></i> Vip</a></li>
+                      <li><a href="support.html"><i class="fas fa-phone"></i> Support</a></li>
+                       <li><a href="blog.html"><i class="fas fa-book"></i> Blog</a></li>
+                        <li><a href="partner.html"><i class="fas fa-building"></i> Partnership</a></li>
+                    <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+        </ul>
+        
+        <div class="mobile-auth-buttons" id="mobileAuthButtons">
+            <button class="btn btn-outline" id="mobileLoginBtn">Login</button>
+            <button class="btn btn-primary" id="mobileRegisterBtn">Register</button>
+        </div>
+    </div>
+
+    <!-- VIP Hero Section -->
+    <section class="vip-hero">
+        <div class="container">
+            <div class="vip-hero-content">
+                <div class="vip-badge">
+                    <i class="fas fa-crown"></i> PREMIUM MEMBERSHIP
+                </div>
+                <h1>Unlock Exclusive Benefits With Delevva VIP</h1>
+                <p>Upgrade your experience with premium features, priority service, and exclusive rewards designed to enhance your delivery experience.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary btn-hero" id="explorePacksBtn">Explore VIP Packs</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP Packs Section -->
+    <section class="vip-packs" id="packs">
+        <div class="container">
+            <div class="section-title">
+                <h2>Choose Your VIP Pack</h2>
+                <p>Select the perfect plan that fits your needs and budget</p>
+            </div>
+            
+            <div class="packs-container">
+                <!-- Basic Pack -->
+                <div class="pack-card pack-basic fade-in">
+                    <div class="pack-header">
+                        <div class="pack-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="pack-title">Basic</h3>
+                        <div class="pack-price">5,000 FCFA</div>
+                        <div class="pack-period">per month</div>
+                    </div>
+                    
+                    <div class="pack-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Free delivery on orders over 10,000 FCFA</li>
+                            <li><i class="fas fa-check"></i> Priority customer support</li>
+                            <li><i class="fas fa-check"></i> 5% cashback on all orders</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Exclusive deals & discounts</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Early access to new features</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Personal account manager</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pack-actions">
+                        <button class="btn btn-pack btn-basic" data-pack="basic">Buy Now</button>
+                        <button class="btn btn-pack btn-more" data-modal="basic">More Details</button>
+                    </div>
+                </div>
+                
+                <!-- Pro Pack (Most Popular) -->
+                <div class="pack-card pack-pro popular fade-in">
+                    <div class="pack-popular-badge">MOST POPULAR</div>
+                    <div class="pack-header">
+                        <div class="pack-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <h3 class="pack-title">Pro</h3>
+                        <div class="pack-price">9,500 FCFA</div>
+                        <div class="pack-period">per month</div>
+                    </div>
+                    
+                    <div class="pack-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Free delivery on all orders</li>
+                            <li><i class="fas fa-check"></i> 24/7 priority customer support</li>
+                            <li><i class="fas fa-check"></i> 10% cashback on all orders</li>
+                            <li><i class="fas fa-check"></i> Exclusive deals & discounts</li>
+                            <li><i class="fas fa-check"></i> Early access to new features</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Personal account manager</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pack-actions">
+                        <button class="btn btn-pack btn-pro" data-pack="pro">Buy Now</button>
+                        <button class="btn btn-pack btn-more" data-modal="pro">More Details</button>
+                    </div>
+                </div>
+                
+                <!-- Premium Pack -->
+                <div class="pack-card pack-premium fade-in">
+                    <div class="pack-header">
+                        <div class="pack-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3 class="pack-title">Premium</h3>
+                        <div class="pack-price">16,500 FCFA</div>
+                        <div class="pack-period">per month</div>
+                    </div>
+                    
+                    <div class="pack-features">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Free delivery on all orders</li>
+                            <li><i class="fas fa-check"></i> 24/7 VIP customer support</li>
+                            <li><i class="fas fa-check"></i> 15% cashback on all orders</li>
+                            <li><i class="fas fa-check"></i> Exclusive deals & discounts</li>
+                            <li><i class="fas fa-check"></i> Early access to new features</li>
+                            <li><i class="fas fa-check"></i> Personal account manager</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pack-actions">
+                        <button class="btn btn-pack btn-premium" data-pack="premium">Buy Now</button>
+                        <button class="btn btn-pack btn-more" data-modal="premium">More Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DP Purchase Section -->
+    <section class="dp-purchase" id="dpPurchase">
+        <div class="container">
+            <div class="section-title">
+                <h2>Buy DP Points</h2>
+                <p>Purchase DP points to use for exclusive VIP benefits and rewards</p>
+            </div>
+            
+            <div class="dp-container">
+                <!-- DP Card 1 -->
+                <div class="dp-card">
+                    <div class="dp-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="dp-amount">10 DP</div>
+                    <div class="dp-price">500 FCFA</div>
+                    <div class="dp-bonus">+0 Bonus DP</div>
+                    <p class="dp-description">Perfect for trying out VIP features</p>
+                    <button class="btn-dp" data-dp-amount="10" data-dp-price="500">Buy Now</button>
+                </div>
+                
+                <!-- DP Card 2 -->
+                <div class="dp-card">
+                    <div class="dp-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <div class="dp-amount">25 DP</div>
+                    <div class="dp-price">1,150 FCFA</div>
+                    <div class="dp-bonus">+2 Bonus DP</div>
+                    <p class="dp-description">Great value for regular users</p>
+                    <button class="btn-dp" data-dp-amount="25" data-dp-price="1150">Buy Now</button>
+                </div>
+                
+                <!-- DP Card 3 (Most Popular) -->
+                <div class="dp-card popular">
+                    <div class="dp-popular-badge">BEST VALUE</div>
+                    <div class="dp-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="dp-amount">50 DP</div>
+                    <div class="dp-price">2,200 FCFA</div>
+                    <div class="dp-bonus">+5 Bonus DP</div>
+                    <p class="dp-description">Most popular choice for VIP members</p>
+                    <button class="btn-dp" data-dp-amount="50" data-dp-price="2200">Buy Now</button>
+                </div>
+                
+                <!-- DP Card 4 -->
+                <div class="dp-card">
+                    <div class="dp-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="dp-amount">100 DP</div>
+                    <div class="dp-price">4,200 FCFA</div>
+                    <div class="dp-bonus">+12 Bonus DP</div>
+                    <p class="dp-description">Maximum value for power users</p>
+                    <button class="btn-dp" data-dp-amount="100" data-dp-price="4200">Buy Now</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <p style="color: var(--gray); font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> 
+                    Earn 1 DP for every 100 FCFA spent on purchases. DP points can be used for VIP benefits and exclusive rewards.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP Benefits Section -->
+    <section class="vip-benefits">
+        <div class="container">
+            <div class="section-title">
+                <h2>VIP Member Benefits</h2>
+                <p>Experience the premium advantages of being a Delevva VIP member</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Priority Delivery</h3>
+                    <p>Your orders are processed and delivered faster than standard customers, with real-time tracking.</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <h3>Exclusive Discounts</h3>
+                    <p>Access to special promotions, flash sales, and member-only discounts not available to regular users.</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>VIP Support</h3>
+                    <p>Get dedicated customer support with faster response times and priority issue resolution.</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Rewards & Cashback</h3>
+                    <p>Earn cashback on every order and receive special birthday rewards and anniversary gifts.</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Secure Payments</h3>
+                    <p>Enjoy enhanced security features and multiple payment options for a seamless checkout experience.</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Account Protection</h3>
+                    <p>Advanced account security with fraud protection and purchase insurance on eligible orders.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP Testimonials -->
+    <section class="vip-testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>What Our VIP Members Say</h2>
+                <p>Hear from our satisfied VIP customers about their experience</p>
+            </div>
+            
+            <div class="testimonials-slider">
+                <div class="testimonials-track" id="testimonialsTrack">
+                    <div class="testimonial-card">
+                        <div class="testimonial-avatar" style="background-image: url('https://randomuser.me/api/portraits/women/32.jpg');"></div>
+                        <p class="testimonial-text">"Since upgrading to Delevva Pro, my delivery experience has been transformed. The priority service saves me hours each week, and the cashback adds up quickly!"</p>
+                        <h4 class="testimonial-author">Sarah Johnson</h4>
+                        <p class="testimonial-role">Pro Member since 2022</p>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-avatar" style="background-image: url('https://randomuser.me/api/portraits/men/54.jpg');"></div>
+                        <p class="testimonial-text">"The Premium package is worth every penny. Having a dedicated account manager has made my business operations so much smoother. Highly recommended!"</p>
+                        <h4 class="testimonial-author">Michael Chen</h4>
+                        <p class="testimonial-role">Premium Member</p>
+                    </div>
+                    
+                    <div class="testimonial-card">
+                        <div class="testimonial-avatar" style="background-image: url('https://randomuser.me/api/portraits/women/67.jpg');"></div>
+                        <p class="testimonial-text">"As a Basic member, I already enjoy benefits that make my life easier. The free delivery on larger orders alone has saved me over 50,000 FCFA in the past few months."</p>
+                        <h4 class="testimonial-author">Emily Rodriguez</h4>
+                        <p class="testimonial-role">Basic Member</p>
+                    </div>
+                </div>
+                
+                <div class="slider-controls">
+                    <div class="slider-dot active" data-slide="0"></div>
+                    <div class="slider-dot" data-slide="1"></div>
+                    <div class="slider-dot" data-slide="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP FAQ Section -->
+    <section class="vip-faq">
+        <div class="container">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Find answers to common questions about our VIP program</p>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What payment methods do you accept for VIP subscriptions?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept Orange Money, MTN Mobile Money, and all major credit cards (Visa, MasterCard). All payments are processed securely through our encrypted payment gateway.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I cancel my VIP subscription at any time?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, you can cancel your VIP subscription at any time through your account settings. Your benefits will remain active until the end of your current billing cycle, after which they will be discontinued.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is there a free trial available for VIP packs?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We occasionally offer free trials for new members. Please check our promotions page or contact our support team to see if any trial offers are currently available.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How does the cashback system work?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Cashback is automatically calculated as a percentage of your order total (excluding delivery fees and taxes) and credited to your Delevva wallet within 24 hours of order completion. You can use these credits for future orders or withdraw them according to our cashback policy.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I upgrade or downgrade my VIP pack?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, you can change your VIP pack at any time. When upgrading, you'll be charged the prorated difference for the remainder of your billing cycle. When downgrading, the change will take effect at the start of your next billing cycle.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIP CTA Section -->
+    <section class="vip-cta">
+        <div class="container">
+            <h2>Ready to Elevate Your Experience?</h2>
+            <p>Join thousands of satisfied customers who have upgraded to Delevva VIP and are enjoying premium benefits</p>
+            <button class="btn btn-cta" id="joinVipBtn">Become a VIP Member Today</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>DELEVVA</h3>
+                    <p>Delivering happiness to your doorstep with fast, reliable, and secure delivery services.</p>
+                    <div class="social-links" style="display: flex; gap: 15px; margin-top: 20px;">
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white; font-size: 20px;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="home.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="vip.html">VIP</a></li>
+                        <li><a href="support.html">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>VIP Program</h3>
+                    <ul class="footer-links">
+                        <li><a href="#packs">VIP Packs</a></li>
+                        <li><a href="#benefits">Benefits</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Delivery St, City, State 12345</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> vip@delevva.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 DELEVVA. All rights reserved. | VIP Program</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="vip.html" class="nav-item active">
+            <i class="fas fa-crown"></i>
+            <span>VIP</span>
+        </a>
+        <a href="dp-purchase.html" class="nav-item">
+            <i class="fas fa-coins"></i>
+            <span>DP</span>
+        </a>
+        <a href="offers.html" class="nav-item">
+            <i class="fas fa-tags"></i>
+            <span>Offers</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Pack Modals -->
+    <!-- Basic Pack Modal -->
+    <div class="modal modal-basic" id="basicModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeBasicModal">&times;</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Delevva Basic</h2>
+                <p class="modal-subtitle">Perfect for occasional users who want enhanced benefits</p>
+                <div class="modal-price">5,000 FCFA<span class="pack-period">/month</span></div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-features">
+                    <h3>What's Included</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Free delivery on orders over 10,000 FCFA</li>
+                        <li><i class="fas fa-check"></i> Priority customer support with 2-hour response time</li>
+                        <li><i class="fas fa-check"></i> 5% cashback on all orders</li>
+                        <li><i class="fas fa-check"></i> Basic order tracking with updates</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Exclusive deals & discounts</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Early access to new features</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Personal account manager</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Advanced analytics dashboard</li>
+                    </ul>
+                </div>
+                
+                <div class="modal-features">
+                    <h3>Perfect For</h3>
+                    <ul>
+                        <li><i class="fas fa-user"></i> Individual users</li>
+                        <li><i class="fas fa-home"></i> Small households</li>
+                        <li><i class="fas fa-shopping-bag"></i> Occasional shoppers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-modal btn-outline" id="closeBasicModalBtn">Not Now</button>
+                <button class="btn btn-modal btn-basic" id="purchaseBasicBtn">Purchase Basic Pack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pro Pack Modal -->
+    <div class="modal modal-pro" id="proModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeProModal">&times;</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Delevva Pro</h2>
+                <p class="modal-subtitle">Our most popular plan for regular users who want premium benefits</p>
+                <div class="modal-price">9,500 FCFA<span class="pack-period">/month</span></div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-features">
+                    <h3>What's Included</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Free delivery on all orders (no minimum)</li>
+                        <li><i class="fas fa-check"></i> 24/7 priority customer support with 30-minute response time</li>
+                        <li><i class="fas fa-check"></i> 10% cashback on all orders</li>
+                        <li><i class="fas fa-check"></i> Advanced real-time order tracking</li>
+                        <li><i class="fas fa-check"></i> Exclusive deals & discounts (up to 30% off)</li>
+                        <li><i class="fas fa-check"></i> Early access to new features and services</li>
+                        <li><i class="fas fa-check"></i> Monthly personalized recommendations</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Personal account manager</li>
+                    </ul>
+                </div>
+                
+                <div class="modal-features">
+                    <h3>Perfect For</h3>
+                    <ul>
+                        <li><i class="fas fa-users"></i> Families</li>
+                        <li><i class="fas fa-briefcase"></i> Freelancers</li>
+                        <li><i class="fas fa-store"></i> Small business owners</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-modal btn-outline" id="closeProModalBtn">Not Now</button>
+                <button class="btn btn-modal btn-pro" id="purchaseProBtn">Purchase Pro Pack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Pack Modal -->
+    <div class="modal modal-premium" id="premiumModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closePremiumModal">&times;</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Delevva Premium</h2>
+                <p class="modal-subtitle">The ultimate VIP experience for power users and businesses</p>
+                <div class="modal-price">16,500 FCFA<span class="pack-period">/month</span></div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-features">
+                    <h3>What's Included</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Free delivery on all orders (no minimum)</li>
+                        <li><i class="fas fa-check"></i> 24/7 VIP customer support with 10-minute response time</li>
+                        <li><i class="fas fa-check"></i> 15% cashback on all orders</li>
+                        <li><i class="fas fa-check"></i> Advanced real-time order tracking with predictive delivery</li>
+                        <li><i class="fas fa-check"></i> Exclusive deals & discounts (up to 50% off)</li>
+                        <li><i class="fas fa-check"></i> Early access to new features and beta programs</li>
+                        <li><i class="fas fa-check"></i> Personal account manager</li>
+                        <li><i class="fas fa-check"></i> Advanced analytics dashboard with insights</li>
+                        <li><i class="fas fa-check"></i> Custom delivery scheduling</li>
+                        <li><i class="fas fa-check"></i> Priority access during high-demand periods</li>
+                    </ul>
+                </div>
+                
+                <div class="modal-features">
+                    <h3>Perfect For</h3>
+                    <ul>
+                        <li><i class="fas fa-building"></i> Businesses</li>
+                        <li><i class="fas fa-user-tie"></i> Executives</li>
+                        <li><i class="fas fa-home"></i> Large households</li>
+                        <li><i class="fas fa-shipping-fast"></i> High-volume users</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-modal btn-outline" id="closePremiumModalBtn">Not Now</button>
+                <button class="btn btn-modal btn-premium" id="purchasePremiumBtn">Purchase Premium Pack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal payment-modal" id="paymentModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closePaymentModal">&times;</button>
+            
+            <div class="modal-header">
+                <div class="payment-success-icon success-checkmark">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="modal-title">Order Confirmed!</h2>
+                <p class="modal-subtitle">Your order has been successfully placed</p>
+                <div class="modal-price" id="paymentPrice">0 FCFA</div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="payment-instructions">
+                    <h3><i class="fas fa-info-circle"></i> Next Steps</h3>
+                    <p>A Delevva agent will contact you shortly with a confirmation code to finalize your order.</p>
+                    
+                    <div class="highlight">
+                        <p><strong>Important:</strong> Please visit the <a href="payment.html" style="color: var(--primary); font-weight: 600;">Payment Page</a> and enter the code provided by our agent to complete your purchase.</p>
+                    </div>
+                    
+                    <p>If you don't receive a code within 15 minutes, please contact our support team for assistance.</p>
+                </div>
+                
+                <div class="payment-actions">
+                    <button class="btn btn-modal btn-outline" id="closePaymentBtn">Close</button>
+                    <a href="payment.html" class="btn btn-modal btn-primary">Go to Payment Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DP Payment Modal -->
+    <div class="modal payment-modal" id="dpPaymentModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeDpPaymentModal">&times;</button>
+            
+            <div class="modal-header">
+                <div class="payment-success-icon success-checkmark">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="modal-title">Order Confirmed!</h2>
+                <p class="modal-subtitle">Your DP points order has been successfully placed</p>
+                <div class="modal-price" id="dpPaymentPrice">0 FCFA</div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="payment-instructions">
+                    <h3><i class="fas fa-info-circle"></i> Next Steps</h3>
+                    <p>A Delevva agent will contact you shortly with a confirmation code to finalize your order.</p>
+                    
+                    <div class="highlight">
+                        <p><strong>Important:</strong> Please visit the <a href="payment.html" style= "color: var(--primary); font-weight: 600; text-decoration: none;">Payment Page</a> and enter the code provided by our agent to complete your purchase.</p>
+                    </div>
+                    
+                    <p>If you don't receive a code within 15 minutes, please contact our support team for assistance.</p>
+                </div>
+                
+                <div class="payment-actions">
+                    <button class="btn btn-modal btn-outline" id="closeDpPaymentBtn">Close</button>
+                    <a href="payment.html" style="text-decoration: none;" class="btn btn-modal btn-primary">Go to Payment Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client correctly
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables
+        let currentUser = null;
+        let currentUserSubscription = null;
+        let selectedPack = null;
+        let selectedPaymentProvider = null;
+        let selectedDpAmount = null;
+        let selectedDpPrice = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication status
+            checkAuthStatus();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize testimonials slider
+            initTestimonialsSlider();
+            
+            // Initialize FAQ accordion
+            initFAQAccordion();
+            
+            // Initialize scroll animations
+            initScrollAnimations();
+        });
+
+        // Check if user is authenticated
+        async function checkAuthStatus() {
+            const user = localStorage.getItem('delevva_user');
+            const userProfile = document.getElementById('userProfile');
+            const authButtons = document.getElementById('authButtons');
+            const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+            const userDropdown = document.getElementById('userDropdown');
+            const dropdownUserName = document.getElementById('dropdownUserName');
+            const userNameItem = document.getElementById('userNameItem');
+            
+            if (user) {
+                // User is logged in
+                const userData = JSON.parse(user);
+                currentUser = userData;
+                
+                const initials = getInitials(userData.name);
+                
+                // Display user initials in profile
+                userProfile.textContent = initials;
+                
+                // Hide auth buttons
+                authButtons.style.display = 'none';
+                mobileAuthButtons.style.display = 'none';
+                
+                // Set user name in dropdown
+                dropdownUserName.textContent = userData.name;
+                userNameItem.innerHTML = `<i class="fas fa-user"></i><span>${userData.name}</span>`;
+                
+                // Show user profile and dropdown
+                userProfile.style.display = 'flex';
+                userDropdown.style.display = 'block';
+                
+                // Check if user already has a subscription
+                await checkUserSubscription(userData.id);
+            } else {
+                // User is not logged in
+                userProfile.style.display = 'none';
+                userDropdown.style.display = 'none';
+                authButtons.style.display = 'flex';
+                mobileAuthButtons.style.display = 'flex';
+            }
+        }
+
+        // Check if user has an active subscription
+        async function checkUserSubscription(userId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_subscriptions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('status', 'active')
+                    .single();
+
+                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+                    console.error('Error fetching subscription:', error);
+                }
+                
+                currentUserSubscription = data;
+                
+                // Update UI based on subscription status
+                updateSubscriptionUI(data);
+                
+            } catch (error) {
+                console.error('Error in checkUserSubscription:', error);
+            }
+        }
+
+        // Update UI based on subscription status
+        function updateSubscriptionUI(subscription) {
+            if (subscription) {
+                // User has an active subscription
+                const packCards = document.querySelectorAll('.pack-card');
+                packCards.forEach(card => {
+                    const packType = card.classList.contains('pack-basic') ? 'basic' : 
+                                    card.classList.contains('pack-pro') ? 'pro' : 'premium';
+                    
+                    if (subscription.pack_type === packType) {
+                        // This is the user's current pack
+                        const button = card.querySelector('.btn-pack:first-child');
+                        button.textContent = 'Current Plan';
+                        button.disabled = true;
+                        button.style.opacity = '0.7';
+                        button.style.cursor = 'not-allowed';
+                        
+                        // Add a badge to indicate current plan
+                        const badge = document.createElement('div');
+                        badge.className = 'pack-popular-badge';
+                        badge.textContent = 'CURRENT PLAN';
+                        badge.style.background = '#10B981';
+                        card.appendChild(badge);
+                    } else if (
+                        (packType === 'pro' && subscription.pack_type === 'basic') ||
+                        (packType === 'premium' && (subscription.pack_type === 'basic' || subscription.pack_type === 'pro'))
+                    ) {
+                        // User can upgrade to this pack
+                        const button = card.querySelector('.btn-pack:first-child');
+                        button.textContent = 'Upgrade';
+                    } else {
+                        // User can't downgrade directly (would need to cancel first)
+                        const button = card.querySelector('.btn-pack:first-child');
+                        button.textContent = 'Not Available';
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    }
+                });
+            }
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Navigation
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            document.getElementById('registerBtn').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            // Mobile menu
+            document.getElementById('hamburger').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileMenuClose').addEventListener('click', toggleMobileMenu);
+            
+            document.getElementById('mobileLoginBtn').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            document.getElementById('mobileRegisterBtn').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('delevva_user');
+                window.location.href = 'index.html';
+            });
+            
+            // User dropdown toggle
+            document.getElementById('userProfile').addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('userDropdown').classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                document.getElementById('userDropdown').classList.remove('active');
+            });
+            
+            // Overlay click
+            document.getElementById('overlay').addEventListener('click', function() {
+                closeAllModals();
+                toggleMobileMenu(false);
+            });
+            
+            // Pack purchase buttons
+            document.querySelectorAll('.btn-pack[data-pack]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const packType = this.getAttribute('data-pack');
+                    handlePackPurchase(packType);
+                });
+            });
+            
+            // More details buttons
+            document.querySelectorAll('.btn-more').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalType = this.getAttribute('data-modal');
+                    openModal(modalType);
+                });
+            });
+            
+            // DP purchase buttons
+            document.querySelectorAll('.btn-dp').forEach(button => {
+                button.addEventListener('click', function() {
+                    const dpAmount = this.getAttribute('data-dp-amount');
+                    const dpPrice = this.getAttribute('data-dp-price');
+                    handleDpPurchase(dpAmount, dpPrice);
+                });
+            });
+            
+            // Modal close buttons
+            document.getElementById('closeBasicModal').addEventListener('click', () => closeModal('basic'));
+            document.getElementById('closeProModal').addEventListener('click', () => closeModal('pro'));
+            document.getElementById('closePremiumModal').addEventListener('click', () => closeModal('premium'));
+            document.getElementById('closePaymentModal').addEventListener('click', () => closeModal('payment'));
+            document.getElementById('closeDpPaymentModal').addEventListener('click', () => closeModal('dpPayment'));
+            
+            document.getElementById('closeBasicModalBtn').addEventListener('click', () => closeModal('basic'));
+            document.getElementById('closeProModalBtn').addEventListener('click', () => closeModal('pro'));
+            document.getElementById('closePremiumModalBtn').addEventListener('click', () => closeModal('premium'));
+            document.getElementById('closePaymentBtn').addEventListener('click', () => closeModal('payment'));
+            document.getElementById('closeDpPaymentBtn').addEventListener('click', () => closeModal('dpPayment'));
+            
+            // Modal purchase buttons
+            document.getElementById('purchaseBasicBtn').addEventListener('click', () => handlePackPurchase('basic'));
+            document.getElementById('purchaseProBtn').addEventListener('click', () => handlePackPurchase('pro'));
+            document.getElementById('purchasePremiumBtn').addEventListener('click', () => handlePackPurchase('premium'));
+            
+            // CTA buttons
+            document.getElementById('explorePacksBtn').addEventListener('click', () => {
+                document.getElementById('packs').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            document.getElementById('joinVipBtn').addEventListener('click', () => {
+                if (currentUser) {
+                    document.getElementById('packs').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('header');
+                if (window.scrollY > 100) {
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.background = 'var(--glass-bg)';
+                    header.style.boxShadow = 'none';
+                }
+            });
+        }
+
+        // Toggle mobile menu
+        function toggleMobileMenu(forceClose) {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            
+            if (forceClose === false || (mobileMenu.classList.contains('active') && forceClose !== true)) {
+                mobileMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                mobileMenu.classList.add('active');
+                hamburger.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Handle pack purchase
+        function handlePackPurchase(packType) {
+            if (!currentUser) {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Check if user already has this pack
+            if (currentUserSubscription && currentUserSubscription.pack_type === packType) {
+                alert(`You're already subscribed to the ${packType} pack!`);
+                return;
+            }
+            
+            // Check if user is trying to downgrade (which requires cancellation first)
+            if (currentUserSubscription && 
+                ((packType === 'basic' && currentUserSubscription.pack_type !== 'basic') ||
+                 (packType === 'pro' && currentUserSubscription.pack_type === 'premium'))) {
+                alert('To change to a lower-tier plan, please cancel your current subscription first or contact support.');
+                return;
+            }
+            
+            // Set selected pack
+            selectedPack = packType;
+            
+            // Close any open modals
+            closeAllModals();
+            
+            // Open payment modal
+            openPaymentModal(packType);
+        }
+
+        // Handle DP purchase
+        function handleDpPurchase(dpAmount, dpPrice) {
+            if (!currentUser) {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Set selected DP amount and price
+            selectedDpAmount = dpAmount;
+            selectedDpPrice = dpPrice;
+            
+            // Close any open modals
+            closeAllModals();
+            
+            // Open DP payment modal
+            openDpPaymentModal(dpAmount, dpPrice);
+        }
+
+        // Open payment modal
+        function openPaymentModal(packType) {
+            const modal = document.getElementById('paymentModal');
+            const overlay = document.getElementById('overlay');
+            const priceElement = document.getElementById('paymentPrice');
+            
+            // Set price based on pack type
+            const price = getPackPrice(packType);
+            priceElement.textContent = `${price.toLocaleString()} FCFA`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Open DP payment modal
+        function openDpPaymentModal(dpAmount, dpPrice) {
+            const modal = document.getElementById('dpPaymentModal');
+            const overlay = document.getElementById('overlay');
+            const priceElement = document.getElementById('dpPaymentPrice');
+            
+            // Set price based on DP amount
+            priceElement.textContent = `${parseInt(dpPrice).toLocaleString()} FCFA`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Get pack price by type
+        function getPackPrice(packType) {
+            switch(packType) {
+                case 'basic': return 5000;
+                case 'pro': return 9500;
+                case 'premium': return 16500;
+                default: return 0;
+            }
+        }
+
+        // Open modal
+        function openModal(modalType) {
+            const modal = document.getElementById(`${modalType}Modal`);
+            const overlay = document.getElementById('overlay');
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal(modalType) {
+            const modal = document.getElementById(`${modalType}Modal`);
+            const overlay = document.getElementById('overlay');
+            
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close all modals
+        function closeAllModals() {
+            const modals = document.querySelectorAll('.modal');
+            const overlay = document.getElementById('overlay');
+            
+            modals.forEach(modal => {
+                modal.classList.remove('active');
+            });
+            
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize testimonials slider
+        function initTestimonialsSlider() {
+            const track = document.getElementById('testimonialsTrack');
+            const dots = document.querySelectorAll('.slider-dot');
+            let currentSlide = 0;
+            
+            function goToSlide(slideIndex) {
+                track.style.transform = `translateX(-${slideIndex * 100}%)`;
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    if (index === slideIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+                
+                currentSlide = slideIndex;
+            }
+            
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', function() {
+                    goToSlide(index);
+                });
+            });
+            
+            // Auto slide testimonials
+            setInterval(function() {
+                let nextSlide = currentSlide + 1;
+                if (nextSlide >= dots.length) {
+                    nextSlide = 0;
+                }
+                goToSlide(nextSlide);
+            }, 5000);
+        }
+
+        // Initialize FAQ accordion
+        function initFAQAccordion() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', function() {
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+        }
+
+        // Initialize scroll animations
+        function initScrollAnimations() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            function checkScroll() {
+                fadeElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementTop < windowHeight - 100) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
+            // Initial check
+            checkScroll();
+            
+            // Check on scroll
+            window.addEventListener('scroll', checkScroll);
+        }
+
+        // Helper function to get initials from name
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase();
+        }
+    </script>
+</body>
+</html>

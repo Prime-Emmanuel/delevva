@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Assistance | Delevva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --dark: #1A1A1A;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        h1, h2, h3, h4, .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF7F00 50%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF7F00 50%, #FFA500 100%);
+        }
+        
+        .gradient-border {
+            position: relative;
+            border: double 2px transparent;
+            background-image: linear-gradient(white, white), linear-gradient(135deg, #FF8C00, #FF7F00, #FFA500);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+        
+        .document-step {
+            position: relative;
+        }
+        
+        .document-step.active .step-number {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF7F00 50%, #FFA500 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px rgba(255, 140, 0, 0.2);
+        }
+        
+        .document-step.completed .step-number {
+            background: linear-gradient(135deg, #10B981 0%, #34D399 50%, #10B981 100%);
+            color: white;
+        }
+        
+        .document-card {
+            transition: all 0.3s ease;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: #FF8C00;
+        }
+        
+        .document-card.selected {
+            border-color: #FF8C00;
+            background-color: #FFF7ED;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+        
+        .option-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .option-card.selected {
+            border-color: #FF8C00;
+            background-color: #FFF7ED;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+        
+        .price-tag {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(135deg, #FF8C00 0%, #FF7F00 50%, #FFA500 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #D1D5DB;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: #FF8C00;
+            background-color: #FFF7ED;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #E5E7EB;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF8C00, #FF7F00, #FFA500);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .checkbox-custom:checked {
+            background-color: #FF8C00;
+            border-color: #FF8C00;
+        }
+        
+        .summary-item {
+            transition: all 0.3s ease;
+        }
+        
+        .summary-item:hover {
+            background-color: #F9FAFB;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Payment Method Styles */
+        .payment-method {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary);
+            background-color: rgba(255, 140, 0, 0.05);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary);
+            background-color: rgba(255, 140, 0, 0.1);
+        }
+        
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+        
+        .payment-icon.orange {
+            background: linear-gradient(135deg, #FF6B00, #FF8C00);
+            color: white;
+        }
+        
+        .payment-icon.mtn {
+            background: linear-gradient(135deg, #FFCC00, #FF9900);
+            color: white;
+        }
+        
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #10B981;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 16px;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn-success {
+            background: #10B981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+        
+        /* Bottom navigation fix */
+        body {
+            padding-bottom: 120px !important;
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 40px !important;
+            }
+        }
+        
+        /* Fix for bottom buttons */
+        .step-buttons {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <nav class="flex justify-between items-center">
+                <!-- Logo -->
+                <a href="dashboard.html" class="flex items-center space-x-2">
+                    <div class="gradient-bg w-10 h-10 rounded-xl flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">D</span>
+                    </div>
+                    <div class="font-montserrat font-bold text-2xl">
+                        <span class="text-gray-900">DELE</span>
+                        <span class="gradient-text">VVA</span>
+                    </div>
+                </a>
+                
+                <!-- Desktop Navigation Icons -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="services.html" class="text-gray-600 hover:text-orange-500 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Services
+                    </a>
+                    <div class="relative cursor-pointer p-2 hover:bg-orange-50 rounded-full transition-colors">
+                        <i class="fas fa-shopping-cart text-gray-600 text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </div>
+                    
+                    <div class="gradient-bg w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">
+                        U
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuButton" class="md:hidden flex flex-col space-y-1.5">
+                    <span class="w-6 h-0.5 bg-gray-800 rounded"></span>
+                    <span class="w-6 h-0.5 bg-gray-800 rounded"></span>
+                    <span class="w-6 h-0.5 bg-gray-800 rounded"></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Page Header -->
+        <div class="text-center mb-10 fade-in">
+            <div class="inline-block p-4 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 mb-4">
+                <i class="fas fa-file-alt text-4xl gradient-text"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-montserrat font-bold mb-3">Document Assistance Service</h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">Professional typing, formatting, editing, printing, and delivery of all your documents. We handle the work while you focus on what matters.</p>
+        </div>
+        
+        <!-- Progress Steps -->
+        <div class="max-w-4xl mx-auto mb-10 slide-up">
+            <div class="flex justify-between items-center relative">
+                <!-- Progress Line -->
+                <div class="absolute top-5 left-0 right-0 h-1 bg-gray-200 z-0"></div>
+                <div id="progressLine" class="absolute top-5 left-0 h-1 gradient-bg z-10 transition-all duration-500"></div>
+                
+                <!-- Steps -->
+                <div class="document-step active z-20">
+                    <div class="step-number w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold mb-2 transition-all duration-300">1</div>
+                    <p class="text-sm font-semibold">Document Type</p>
+                </div>
+                
+                <div class="document-step z-20">
+                    <div class="step-number w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold mb-2 transition-all duration-300">2</div>
+                    <p class="text-sm font-semibold">Details & Upload</p>
+                </div>
+                
+                <div class="document-step z-20">
+                    <div class="step-number w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold mb-2 transition-all duration-300">3</div>
+                    <p class="text-sm font-semibold">Additional Services</p>
+                </div>
+                
+                <div class="document-step z-20">
+                    <div class="step-number w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center font-bold mb-2 transition-all duration-300">4</div>
+                    <p class="text-sm font-semibold">Review & Order</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Document Type Selection -->
+        <div id="step1" class="max-w-6xl mx-auto fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 font-montserrat">Select Document Type</h2>
+                <p class="text-gray-600 mb-6">Choose the type of document you need assistance with</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- CV/Resume -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('cv')">
+                    <div class="relative">
+                        <div class="price-tag">From 5,000 FCFA</div>
+                        <div class="w-16 h-16 rounded-xl gradient-bg flex items-center justify-center mb-4">
+                            <i class="fas fa-user-tie text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">CV / Resume</h3>
+                    <p class="text-gray-600 text-sm mb-4">Professional resume writing, formatting, and optimization for job applications.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Professional formatting</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> ATS optimization</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Custom templates</li>
+                    </ul>
+                </div>
+                
+                <!-- Report -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('report')">
+                    <div class="relative">
+                        <div class="price-tag">From 8,000 FCFA</div>
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
+                            <i class="fas fa-chart-bar text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Business Report</h3>
+                    <p class="text-gray-600 text-sm mb-4">Professional business reports, analysis documents, and corporate presentations.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Data analysis</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Charts & graphs</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Executive summary</li>
+                    </ul>
+                </div>
+                
+                <!-- Academic Paper -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('academic')">
+                    <div class="relative">
+                        <div class="price-tag">From 10,000 FCFA</div>
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                            <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Academic Paper</h3>
+                    <p class="text-gray-600 text-sm mb-4">Theses, dissertations, research papers, and academic essays with proper formatting.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> APA/MLA formatting</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Bibliography</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Proofreading</li>
+                    </ul>
+                </div>
+                
+                <!-- Letter/Memo -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('letter')">
+                    <div class="relative">
+                        <div class="price-tag">From 3,000 FCFA</div>
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-4">
+                            <i class="fas fa-envelope-open-text text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Letter / Memo</h3>
+                    <p class="text-gray-600 text-sm mb-4">Formal letters, business correspondence, memos, and official communications.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Formal formatting</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Multiple copies</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Official templates</li>
+                    </ul>
+                </div>
+                
+                <!-- Presentation -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('presentation')">
+                    <div class="relative">
+                        <div class="price-tag">From 12,000 FCFA</div>
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center mb-4">
+                            <i class="fas fa-presentation text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Presentation</h3>
+                    <p class="text-gray-600 text-sm mb-4">PowerPoint presentations, slide decks, and visual presentations for business or academic use.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Professional designs</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Animation effects</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Speaker notes</li>
+                    </ul>
+                </div>
+                
+                <!-- Custom Document -->
+                <div class="document-card bg-white rounded-xl p-6 cursor-pointer" onclick="selectDocumentType('custom')">
+                    <div class="relative">
+                        <div class="price-tag">Custom Price</div>
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-r from-gray-700 to-gray-900 flex items-center justify-center mb-4">
+                            <i class="fas fa-edit text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Custom Document</h3>
+                    <p class="text-gray-600 text-sm mb-4">Any other type of document not listed here. We'll work with you to create exactly what you need.</p>
+                    <ul class="text-gray-500 text-sm space-y-1 mb-4">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Fully customized</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Consultation included</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Flexible requirements</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-end mt-10 step-buttons">
+                <button onclick="nextStep()" class="gradient-bg text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg transition-shadow flex items-center btn">
+                    Next Step <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Document Details & Upload -->
+        <div id="step2" class="max-w-4xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 font-montserrat">Document Details & Upload</h2>
+                <p class="text-gray-600 mb-6">Provide details about your document and upload any reference materials</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-4">Document Details</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Document Title</label>
+                            <input type="text" id="docTitle" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="e.g., Annual Report 2024">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 mb-2">Number of Pages (Approx.)</label>
+                            <select id="pageCount" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                <option value="">Select pages</option>
+                                <option value="1-5">1-5 pages</option>
+                                <option value="6-10">6-10 pages</option>
+                                <option value="11-20">11-20 pages</option>
+                                <option value="21-50">21-50 pages</option>
+                                <option value="50+">50+ pages</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Formatting Style</label>
+                        <div class="flex flex-wrap gap-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="format" value="APA" class="mr-2">
+                                <span>APA</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" value="MLA" class="mr-2">
+                                <span>MLA</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" value="Chicago" class="mr-2">
+                                <span>Chicago</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" value="Harvard" class="mr-2">
+                                <span>Harvard</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="format" value="None" class="mr-2">
+                                <span>No specific format</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Deadline</label>
+                        <div class="flex flex-wrap gap-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="deadline" value="24h" class="mr-2">
+                                <span class="bg-red-50 text-red-700 px-3 py-1 rounded-full text-sm">24 Hours (Express)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="deadline" value="48h" class="mr-2">
+                                <span class="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-sm">48 Hours</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="deadline" value="3d" class="mr-2">
+                                <span class="bg-yellow-50 text-yellow-700 px-3 py-1 rounded-full text-sm">3 Days</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="deadline" value="1w" class="mr-2">
+                                <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">1 Week</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="deadline" value="flexible" class="mr-2">
+                                <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">Flexible</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Additional Instructions</label>
+                        <textarea id="instructions" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="Provide any specific instructions, requirements, or details about your document..."></textarea>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Upload Reference Materials</h3>
+                    <p class="text-gray-600 mb-4">Upload handwritten notes, images, audio recordings, or any reference materials for your document</p>
+                    
+                    <div id="fileUploadArea" class="file-upload-area rounded-2xl p-8 text-center mb-4">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <h4 class="text-lg font-semibold mb-2">Drop files here or click to upload</h4>
+                        <p class="text-gray-500 text-sm mb-4">Supported files: PDF, DOC, DOCX, JPG, PNG, MP3, WAV (Max 20MB each)</p>
+                        <button onclick="document.getElementById('fileInput').click()" class="gradient-bg text-white font-semibold py-2 px-6 rounded-xl hover:shadow-lg transition-shadow">
+                            <i class="fas fa-folder-open mr-2"></i> Browse Files
+                        </button>
+                        <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this.files)">
+                    </div>
+                    
+                    <div id="fileList" class="space-y-3">
+                        <!-- Files will appear here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-10 step-buttons">
+                <button onclick="prevStep()" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl hover:bg-gray-300 transition-colors flex items-center btn">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="nextStep()" class="gradient-bg text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg transition-shadow flex items-center btn">
+                    Next Step <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Additional Services -->
+        <div id="step3" class="max-w-4xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 font-montserrat">Additional Services</h2>
+                <p class="text-gray-600 mb-6">Enhance your document with these premium services</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Digital Delivery -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('digital')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center mr-4">
+                                <i class="fas fa-mobile-alt text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Digital Delivery</h3>
+                            <p class="text-gray-600 text-sm">Get your document delivered to your phone/email</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold gradient-text">Included</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="digital-checkbox"></div>
+                    </div>
+                </div>
+                
+                <!-- Professional Printing -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('printing')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-print text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Professional Printing</h3>
+                            <p class="text-gray-600 text-sm">High-quality printing on premium paper</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-blue-600">+ 500 FCFA / page</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="printing-checkbox"></div>
+                    </div>
+                </div>
+                
+                <!-- Document Scanning -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('scanning')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-scanner text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Document Scanning</h3>
+                            <p class="text-gray-600 text-sm">Convert physical documents to digital format</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-purple-600">+ 300 FCFA / page</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="scanning-checkbox"></div>
+                    </div>
+                </div>
+                
+                <!-- Proofreading & Editing -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('proofreading')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-spell-check text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Proofreading & Editing</h3>
+                            <p class="text-gray-600 text-sm">Professional editing for grammar, spelling, and style</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-green-600">+ 2,000 FCFA</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="proofreading-checkbox"></div>
+                    </div>
+                </div>
+                
+                <!-- Express Delivery -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('express')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-bolt text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Express Delivery</h3>
+                            <p class="text-gray-600 text-sm">Get your document delivered within 2 hours</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-red-600">+ 1,500 FCFA</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="express-checkbox"></div>
+                    </div>
+                </div>
+                
+                <!-- Binding & Finishing -->
+                <div class="option-card bg-white rounded-2xl p-6 border-2 border-gray-200" onclick="toggleOption('binding')">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-book text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Binding & Finishing</h3>
+                            <p class="text-gray-600 text-sm">Professional binding, laminating, or stapling</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-amber-600">+ 1,000 FCFA</span>
+                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 option-checkbox" id="binding-checkbox"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delivery Address -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <h3 class="text-lg font-bold mb-4">Delivery Address (if physical delivery required)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Address</label>
+                        <input type="text" id="address" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="Street address">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Phone Number for Delivery</label>
+                        <input type="tel" id="phone" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300" placeholder="+237 XXX XXX XXX">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-10 step-buttons">
+                <button onclick="prevStep()" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl hover:bg-gray-300 transition-colors flex items-center btn">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="nextStep()" class="gradient-bg text-white font-bold py-3 px-8 rounded-xl hover:shadow-lg transition-shadow flex items-center btn">
+                    Next Step <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Review & Order -->
+        <div id="step4" class="max-w-4xl mx-auto hidden fade-in">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-4 font-montserrat">Review Your Order</h2>
+                <p class="text-gray-600 mb-6">Please review all details before placing your order</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                <!-- Order Summary -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-4">Order Summary</h3>
+                    <div class="space-y-4">
+                        <div class="summary-item flex justify-between items-center p-4 border border-gray-200 rounded-xl">
+                            <div>
+                                <h4 class="font-semibold" id="summaryDocType">Document Type</h4>
+                                <p class="text-gray-600 text-sm" id="summaryDocTitle">Document Title</p>
+                            </div>
+                            <span class="font-bold" id="summaryDocPrice">0 FCFA</span>
+                        </div>
+                        
+                        <div id="additionalServicesList">
+                            <!-- Additional services will appear here -->
+                        </div>
+                        
+                        <!-- Subtotal -->
+                        <div class="flex justify-between items-center pt-4 border-t">
+                            <span class="font-semibold">Subtotal</span>
+                            <span class="font-bold" id="subtotal">0 FCFA</span>
+                        </div>
+                        
+                        <!-- Delivery Fee -->
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold">Delivery Fee</span>
+                            <span class="font-bold" id="deliveryFee">0 FCFA</span>
+                        </div>
+                        
+                        <!-- Total -->
+                        <div class="flex justify-between items-center pt-4 border-t">
+                            <span class="text-xl font-bold">Total</span>
+                            <span class="text-2xl font-bold gradient-text" id="totalPrice">0 FCFA</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delivery Information -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-4">Delivery Information</h3>
+                    <div class="bg-gray-50 p-4 rounded-xl">
+                        <p class="text-gray-700"><span class="font-semibold">Delivery Method:</span> <span id="deliveryMethod">Digital Delivery</span></p>
+                        <p class="text-gray-700 mt-2"><span class="font-semibold">Estimated Delivery:</span> <span id="estimatedDelivery">24-48 hours</span></p>
+                        <p class="text-gray-700 mt-2"><span class="font-semibold">Delivery Address:</span> <span id="summaryAddress">Not specified</span></p>
+                    </div>
+                </div>
+                
+                <!-- Terms & Conditions -->
+                <div class="mb-8">
+                    <label class="flex items-start">
+                        <input type="checkbox" id="terms" class="mt-1 mr-3 checkbox-custom">
+                        <span class="text-gray-700 text-sm">
+                            I agree to the <a href="#" class="text-orange-500 hover:underline">Terms of Service</a> and <a href="#" class="text-orange-500 hover:underline">Privacy Policy</a>. I understand that my document will be handled professionally and confidentially by Delevva's expert team.
+                        </span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-10 step-buttons">
+                <button onclick="prevStep()" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-xl hover:bg-gray-300 transition-colors flex items-center btn">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <button onclick="showPaymentModal()" class="gradient-bg text-white font-bold py-3 px-10 rounded-xl hover:shadow-lg transition-shadow flex items-center text-lg btn">
+                    <i class="fas fa-shopping-cart mr-2"></i> Proceed to Payment
+                </button>
+            </div>
+        </div>
+        
+        <!-- Payment Modal -->
+        <div id="paymentModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-2xl font-bold font-montserrat">Complete Payment</h2>
+                    <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Order Summary -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold mb-3">Order Summary</h3>
+                        <div class="bg-gray-50 p-4 rounded-xl">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Document Service:</span>
+                                <span class="font-semibold" id="paymentDocType">-</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Additional Services:</span>
+                                <span class="font-semibold" id="paymentAdditional">-</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Delivery:</span>
+                                <span class="font-semibold" id="paymentDelivery">-</span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t">
+                                <span class="text-lg font-bold">Total Amount:</span>
+                                <span class="text-xl font-bold gradient-text" id="paymentTotal">0 FCFA</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold mb-3">Select Payment Method</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Choose your preferred mobile money payment method</p>
+                        
+                        <div class="payment-method" onclick="selectPaymentMethod('orange')" id="orangePayment">
+                            <div class="flex items-center">
+                                <div class="payment-icon orange">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">Orange Money</h4>
+                                    <p class="text-gray-600 text-sm">Pay via Orange Money mobile payment</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method" onclick="selectPaymentMethod('mtn')" id="mtnPayment">
+                            <div class="flex items-center">
+                                <div class="payment-icon mtn">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">MTN Mobile Money</h4>
+                                    <p class="text-gray-600 text-sm">Pay via MTN Mobile Money</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Instructions -->
+                    <div class="mb-6" id="paymentInstructions" style="display: none;">
+                        <h3 class="text-lg font-bold mb-3" id="instructionsTitle">Payment Instructions</h3>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r">
+                            <div id="orangeInstructions" style="display: none;">
+                                <p class="font-semibold mb-2">To pay with Orange Money:</p>
+                                <ol class="list-decimal pl-5 space-y-1 text-sm">
+                                    <li>Dial #144# on your Orange mobile phone</li>
+                                    <li>Select "Send Money"</li>
+                                    <li>Enter phone number: <span class="font-bold">656335789</span></li>
+                                    <li>Enter amount: <span id="orangeAmount" class="font-bold">0 FCFA</span></li>
+                                    <li>Enter your PIN to confirm</li>
+                                    <li>Take a screenshot of the confirmation</li>
+                                </ol>
+                            </div>
+                            <div id="mtnInstructions" style="display: none;">
+                                <p class="font-semibold mb-2">To pay with MTN Mobile Money:</p>
+                                <ol class="list-decimal pl-5 space-y-1 text-sm">
+                                    <li>Dial *126# on your MTN mobile phone</li>
+                                    <li>Select "Send Money"</li>
+                                    <li>Enter phone number: <span class="font-bold">656335789</span></li>
+                                    <li>Enter amount: <span id="mtnAmount" class="font-bold">0 FCFA</span></li>
+                                    <li>Enter your PIN to confirm</li>
+                                    <li>Take a screenshot of the confirmation</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Confirmation -->
+                    <div class="mb-6" id="paymentConfirmation" style="display: none;">
+                        <label class="flex items-start">
+                            <input type="checkbox" id="paymentConfirmed" class="mt-1 mr-3">
+                            <span class="text-gray-700 text-sm">
+                                I confirm that I have completed the payment via the selected mobile money method and have taken a screenshot of the payment confirmation.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closePaymentModal()" class="btn btn-secondary">Cancel</button>
+                    <button onclick="submitOrder()" class="btn btn-success" id="submitOrderBtn" disabled>Submit Order</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Success Modal -->
+        <div id="successModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="success-message">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 font-montserrat">Request Sent Successfully!</h3>
+                        <p class="text-gray-600 mb-6" id="successMessage">
+                            Your service request has been sent to our agents. An agent will review your request and get back to you as soon as possible.
+                        </p>
+                        <p class="text-gray-700 mb-6 bg-gray-50 p-4 rounded-xl">
+                            <span class="font-semibold">Order ID:</span> <span id="orderId">DEL-DOC-2024-001</span><br>
+                            <span class="font-semibold">Amount:</span> <span id="successAmount">0 FCFA</span><br>
+                            <span class="font-semibold">Payment Method:</span> <span id="successPayment">-</span>
+                        </p>
+                        <p class="text-sm text-gray-500 mb-6">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            When an agent confirms your request, go to "My Orders" to complete the payment.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="goToDashboard()" class="btn btn-primary">
+                                Go to Dashboard
+                            </button>
+                            <button onclick="goToOrders()" class="btn btn-secondary">
+                                View My Orders
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 md:hidden">
+        <div class="flex justify-around items-center py-3">
+            <a href="dashboard.html" class="flex flex-col items-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Home</span>
+            </a>
+            <a href="services.html" class="flex flex-col items-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Services</span>
+            </a>
+            <a href="orders.html" class="flex flex-col items-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-clipboard-list text-xl mb-1"></i>
+                <span class="text-xs">Orders</span>
+            </a>
+            <a href="rewards.html" class="flex flex-col items-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-gift text-xl mb-1"></i>
+                <span class="text-xs">Rewards</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center text-gray-500 hover:text-orange-500 transition-colors">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let selectedDocumentType = null;
+        let selectedOptions = {
+            digital: true,
+            printing: false,
+            scanning: false,
+            proofreading: false,
+            express: false,
+            binding: false
+        };
+        
+        let uploadedFiles = [];
+        let orderData = {
+            documentType: '',
+            documentTitle: '',
+            pageCount: '',
+            formatting: '',
+            deadline: '',
+            instructions: '',
+            address: '',
+            phone: '',
+            additionalServices: [],
+            subtotal: 0,
+            deliveryFee: 0,
+            total: 0
+        };
+        
+        let selectedPaymentMethod = null;
+        
+        // Document type prices
+        const documentPrices = {
+            'cv': 5000,
+            'report': 8000,
+            'academic': 10000,
+            'letter': 3000,
+            'presentation': 12000,
+            'custom': 5000 // Default custom price
+        };
+        
+        // Step navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                // Validate current step before proceeding
+                if (validateStep(currentStep)) {
+                    document.getElementById(`step${currentStep}`).classList.add('hidden');
+                    currentStep++;
+                    document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                    updateProgress();
+                    
+                    // Update order summary on step 4
+                    if (currentStep === 4) {
+                        updateOrderSummary();
+                    }
+                }
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.add('hidden');
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.remove('hidden');
+                updateProgress();
+            }
+        }
+        
+        function updateProgress() {
+            // Update step indicators
+            const steps = document.querySelectorAll('.document-step');
+            const progressLine = document.getElementById('progressLine');
+            
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update progress line
+            const progressPercentage = ((currentStep - 1) / 3) * 100;
+            progressLine.style.width = `${progressPercentage}%`;
+        }
+        
+        // Step validation
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    if (!selectedDocumentType) {
+                        alert('Please select a document type');
+                        return false;
+                    }
+                    return true;
+                    
+                case 2:
+                    const docTitle = document.getElementById('docTitle').value;
+                    if (!docTitle.trim()) {
+                        alert('Please enter a document title');
+                        return false;
+                    }
+                    
+                    const pageCount = document.getElementById('pageCount').value;
+                    if (!pageCount) {
+                        alert('Please select approximate page count');
+                        return false;
+                    }
+                    
+                    const deadline = document.querySelector('input[name="deadline"]:checked');
+                    if (!deadline) {
+                        alert('Please select a deadline');
+                        return false;
+                    }
+                    
+                    // Save data
+                    orderData.documentType = selectedDocumentType;
+                    orderData.documentTitle = docTitle;
+                    orderData.pageCount = pageCount;
+                    orderData.formatting = document.querySelector('input[name="format"]:checked')?.value || 'None';
+                    orderData.deadline = deadline.value;
+                    orderData.instructions = document.getElementById('instructions').value;
+                    
+                    return true;
+                    
+                case 3:
+                    orderData.address = document.getElementById('address').value;
+                    orderData.phone = document.getElementById('phone').value;
+                    return true;
+                    
+                default:
+                    return true;
+            }
+        }
+        
+        // Document type selection
+        function selectDocumentType(type) {
+            selectedDocumentType = type;
+            
+            // Remove selected class from all cards
+            document.querySelectorAll('.document-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            event.currentTarget.classList.add('selected');
+        }
+        
+        // Additional services toggle
+        function toggleOption(option) {
+            selectedOptions[option] = !selectedOptions[option];
+            const checkbox = document.getElementById(`${option}-checkbox`);
+            
+            if (selectedOptions[option]) {
+                checkbox.classList.add('gradient-bg');
+                checkbox.innerHTML = '<i class="fas fa-check text-white text-xs"></i>';
+                checkbox.style.borderColor = '#FF8C00';
+            } else {
+                checkbox.classList.remove('gradient-bg');
+                checkbox.innerHTML = '';
+                checkbox.style.borderColor = '#D1D5DB';
+            }
+            
+            // Update option card style
+            const card = event.currentTarget;
+            if (selectedOptions[option]) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        }
+        
+        // File upload handling
+        function handleFiles(files) {
+            const fileList = document.getElementById('fileList');
+            
+            for (let file of files) {
+                if (file.size > 20 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large. Maximum size is 20MB.`);
+                    continue;
+                }
+                
+                uploadedFiles.push(file);
+                
+                const fileElement = document.createElement('div');
+                fileElement.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-xl';
+                fileElement.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-file text-gray-500 mr-3"></i>
+                        <div>
+                            <p class="font-medium">${file.name}</p>
+                            <p class="text-gray-500 text-sm">${(file.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFile('${file.name}')" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                fileList.appendChild(fileElement);
+            }
+        }
+        
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+            
+            // Remove from UI
+            const fileElements = document.querySelectorAll('#fileList div');
+            fileElements.forEach(element => {
+                if (element.textContent.includes(fileName)) {
+                    element.remove();
+                }
+            });
+        }
+        
+        // Update order summary
+        function updateOrderSummary() {
+            // Document type and title
+            document.getElementById('summaryDocType').textContent = getDocumentTypeName(selectedDocumentType);
+            document.getElementById('summaryDocTitle').textContent = orderData.documentTitle || 'No title specified';
+            
+            // Base price
+            const basePrice = documentPrices[selectedDocumentType] || 5000;
+            document.getElementById('summaryDocPrice').textContent = basePrice.toLocaleString() + ' FCFA';
+            
+            // Additional services
+            const servicesList = document.getElementById('additionalServicesList');
+            servicesList.innerHTML = '';
+            
+            let additionalServicesTotal = 0;
+            const additionalServices = [];
+            
+            // Calculate additional services
+            if (selectedOptions.printing) {
+                const pageCount = parseInt(orderData.pageCount.split('-')[0]) || 5;
+                const printingCost = pageCount * 500;
+                additionalServicesTotal += printingCost;
+                additionalServices.push({ name: 'Professional Printing', price: printingCost });
+            }
+            
+            if (selectedOptions.scanning) {
+                const scanningCost = 300;
+                additionalServicesTotal += scanningCost;
+                additionalServices.push({ name: 'Document Scanning', price: scanningCost });
+            }
+            
+            if (selectedOptions.proofreading) {
+                additionalServicesTotal += 2000;
+                additionalServices.push({ name: 'Proofreading & Editing', price: 2000 });
+            }
+            
+            if (selectedOptions.express) {
+                additionalServicesTotal += 1500;
+                additionalServices.push({ name: 'Express Delivery', price: 1500 });
+            }
+            
+            if (selectedOptions.binding) {
+                additionalServicesTotal += 1000;
+                additionalServices.push({ name: 'Binding & Finishing', price: 1000 });
+            }
+            
+            // Display additional services
+            additionalServices.forEach(service => {
+                const serviceElement = document.createElement('div');
+                serviceElement.className = 'summary-item flex justify-between items-center p-4 border border-gray-200 rounded-xl';
+                serviceElement.innerHTML = `
+                    <div>
+                        <h4 class="font-semibold">${service.name}</h4>
+                    </div>
+                    <span class="font-bold">+ ${service.price.toLocaleString()} FCFA</span>
+                `;
+                servicesList.appendChild(serviceElement);
+            });
+            
+            // Calculate totals
+            const subtotal = basePrice + additionalServicesTotal;
+            const deliveryFee = selectedOptions.express ? 1500 : 500;
+            const total = subtotal + deliveryFee;
+            
+            // Update totals
+            document.getElementById('subtotal').textContent = subtotal.toLocaleString() + ' FCFA';
+            document.getElementById('deliveryFee').textContent = deliveryFee.toLocaleString() + ' FCFA';
+            document.getElementById('totalPrice').textContent = total.toLocaleString() + ' FCFA';
+            
+            // Update delivery information
+            const deliveryMethod = selectedOptions.digital ? 'Digital Delivery' : 'Physical Delivery';
+            const estimatedDelivery = selectedOptions.express ? '2 hours' : '24-48 hours';
+            
+            document.getElementById('deliveryMethod').textContent = deliveryMethod;
+            document.getElementById('estimatedDelivery').textContent = estimatedDelivery;
+            document.getElementById('summaryAddress').textContent = orderData.address || 'Not specified';
+            
+            // Save to order data
+            orderData.additionalServices = additionalServices;
+            orderData.subtotal = subtotal;
+            orderData.deliveryFee = deliveryFee;
+            orderData.total = total;
+        }
+        
+        function getDocumentTypeName(type) {
+            const names = {
+                'cv': 'CV / Resume',
+                'report': 'Business Report',
+                'academic': 'Academic Paper',
+                'letter': 'Letter / Memo',
+                'presentation': 'Presentation',
+                'custom': 'Custom Document'
+            };
+            return names[type] || 'Document';
+        }
+        
+        // Show payment modal
+        function showPaymentModal() {
+            const terms = document.getElementById('terms');
+            if (!terms.checked) {
+                alert('Please agree to the Terms and Conditions');
+                return;
+            }
+            
+            // Update payment modal with order details
+            document.getElementById('paymentDocType').textContent = getDocumentTypeName(selectedDocumentType);
+            
+            const additionalServicesText = orderData.additionalServices.length > 0 
+                ? orderData.additionalServices.map(s => s.name).join(', ')
+                : 'None';
+            document.getElementById('paymentAdditional').textContent = additionalServicesText;
+            
+            const deliveryText = selectedOptions.express ? 'Express Delivery (2 hours)' : 'Standard Delivery (24-48 hours)';
+            document.getElementById('paymentDelivery').textContent = deliveryText;
+            
+            document.getElementById('paymentTotal').textContent = orderData.total.toLocaleString() + ' FCFA';
+            
+            // Set amounts in payment instructions
+            document.getElementById('orangeAmount').textContent = orderData.total.toLocaleString() + ' FCFA';
+            document.getElementById('mtnAmount').textContent = orderData.total.toLocaleString() + ' FCFA';
+            
+            // Show payment modal
+            document.getElementById('paymentModal').style.display = 'flex';
+            
+            // Reset payment selection
+            selectedPaymentMethod = null;
+            document.getElementById('paymentInstructions').style.display = 'none';
+            document.getElementById('paymentConfirmation').style.display = 'none';
+            document.getElementById('submitOrderBtn').disabled = true;
+            
+            // Reset payment method selection
+            document.getElementById('orangePayment').classList.remove('selected');
+            document.getElementById('mtnPayment').classList.remove('selected');
+        }
+        
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+        
+        // Select payment method
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update UI
+            document.getElementById('orangePayment').classList.remove('selected');
+            document.getElementById('mtnPayment').classList.remove('selected');
+            document.getElementById(method + 'Payment').classList.add('selected');
+            
+            // Show instructions for selected method
+            document.getElementById('paymentInstructions').style.display = 'block';
+            document.getElementById('orangeInstructions').style.display = method === 'orange' ? 'block' : 'none';
+            document.getElementById('mtnInstructions').style.display = method === 'mtn' ? 'block' : 'none';
+            document.getElementById('instructionsTitle').textContent = method === 'orange' ? 'Orange Money Instructions' : 'MTN Mobile Money Instructions';
+            
+            // Show payment confirmation checkbox
+            document.getElementById('paymentConfirmation').style.display = 'block';
+            
+            // Enable submit button when payment is confirmed
+            const paymentConfirmed = document.getElementById('paymentConfirmed');
+            paymentConfirmed.checked = false;
+            paymentConfirmed.onchange = function() {
+                document.getElementById('submitOrderBtn').disabled = !this.checked;
+            };
+        }
+        
+        // Submit order to WhatsApp
+        function submitOrder() {
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+            
+            if (!document.getElementById('paymentConfirmed').checked) {
+                alert('Please confirm that you have completed the payment');
+                return;
+            }
+            
+            // Generate order ID
+            const orderId = 'DEL-DOC-' + Date.now().toString().slice(-8);
+            
+            // Prepare WhatsApp message
+            const whatsappNumber = '656335789';
+            
+            // Format additional services
+            const additionalServicesText = orderData.additionalServices.length > 0 
+                ? orderData.additionalServices.map(s => `${s.name}: ${s.price.toLocaleString()} FCFA`).join('\n')
+                : 'None';
+            
+            // Create order summary for WhatsApp
+            const message = `*NEW DOCUMENT ASSISTANCE ORDER*%0A%0A` +
+                           `*Order ID:* ${orderId}%0A` +
+                           `*Document Type:* ${getDocumentTypeName(selectedDocumentType)}%0A` +
+                           `*Document Title:* ${orderData.documentTitle}%0A` +
+                           `*Page Count:* ${orderData.pageCount}%0A` +
+                           `*Formatting:* ${orderData.formatting}%0A` +
+                           `*Deadline:* ${getDeadlineText(orderData.deadline)}%0A` +
+                           `*Additional Services:*%0A${additionalServicesText}%0A` +
+                           `*Total Amount:* ${orderData.total.toLocaleString()} FCFA%0A` +
+                           `*Payment Method:* ${selectedPaymentMethod === 'orange' ? 'Orange Money' : 'MTN Mobile Money'}%0A` +
+                           `*Customer Phone:* ${orderData.phone || 'Not provided'}%0A` +
+                           `*Delivery Address:* ${orderData.address || 'Digital delivery'}%0A%0A` +
+                           `*Special Instructions:*%0A${orderData.instructions || 'None'}`;
+            
+            // Close payment modal
+            closePaymentModal();
+            
+            // Update success modal
+            document.getElementById('orderId').textContent = orderId;
+            document.getElementById('successAmount').textContent = orderData.total.toLocaleString() + ' FCFA';
+            document.getElementById('successPayment').textContent = selectedPaymentMethod === 'orange' ? 'Orange Money' : 'MTN Mobile Money';
+            
+            // Show success modal
+            document.getElementById('successModal').style.display = 'flex';
+            
+            // Open WhatsApp in new tab (commented out for testing)
+            // window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+            
+            // For testing, show the message that would be sent
+            console.log('WhatsApp message:', decodeURIComponent(message));
+            console.log('Order would be sent to:', whatsappNumber);
+            
+            // In production, uncomment the window.open line above
+            // For now, we'll simulate the WhatsApp opening
+            setTimeout(() => {
+                alert('Order request would be sent to WhatsApp number 656335789. In production, this would open WhatsApp with the order details.');
+            }, 500);
+        }
+        
+        function getDeadlineText(deadline) {
+            const deadlines = {
+                '24h': '24 Hours (Express)',
+                '48h': '48 Hours',
+                '3d': '3 Days',
+                '1w': '1 Week',
+                'flexible': 'Flexible'
+            };
+            return deadlines[deadline] || 'Flexible';
+        }
+        
+        // Success modal actions
+        function goToDashboard() {
+            document.getElementById('successModal').style.display = 'none';
+            window.location.href = 'dashboard.html';
+        }
+        
+        function goToOrders() {
+            document.getElementById('successModal').style.display = 'none';
+            window.location.href = 'orders.html';
+        }
+        
+        // Close modals when clicking outside
+        document.getElementById('paymentModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePaymentModal();
+            }
+        });
+        
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set digital delivery as selected by default
+            const digitalCheckbox = document.getElementById('digital-checkbox');
+            digitalCheckbox.classList.add('gradient-bg');
+            digitalCheckbox.innerHTML = '<i class="fas fa-check text-white text-xs"></i>';
+            digitalCheckbox.style.borderColor = '#FF8C00';
+            
+            // Set digital delivery card as selected
+            document.querySelector('[onclick="toggleOption(\'digital\')"]').classList.add('selected');
+            
+            // Initialize progress
+            updateProgress();
+            
+            // Initialize file upload area drag and drop
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+            
+            fileUploadArea.addEventListener('dragleave', () => {
+                fileUploadArea.classList.remove('dragover');
+            });
+            
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+        });
+    </script>
+</body>
+</html>

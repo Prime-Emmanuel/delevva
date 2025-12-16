@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Document Verification</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px 0;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid #f0f0f0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .stat-icon.pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-icon.verified { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-icon.rejected { background: rgba(238, 90, 82, 0.1); color: var(--danger); }
+        .stat-icon.total { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Verification Table */
+        .verification-table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e0443c;
+            transform: translateY(-2px);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .verification-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .verification-table th {
+            background: var(--light);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .verification-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .verification-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .verification-table tr:hover {
+            background: rgba(255, 140, 0, 0.02);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .document-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-type {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .document-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.verified {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.rejected {
+            background: rgba(238, 90, 82, 0.1);
+            color: var(--danger);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 14px;
+        }
+
+        .action-btn.view {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .action-btn.view:hover {
+            background: var(--info);
+            color: white;
+        }
+
+        .action-btn.approve {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .action-btn.approve:hover {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn.reject {
+            background: rgba(238, 90, 82, 0.1);
+            color: var(--danger);
+        }
+
+        .action-btn.reject:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn.disabled {
+            background: #f8f9fa;
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .pagination-btn.disabled:hover {
+            background: #f8f9fa;
+            color: var(--gray);
+            border-color: #e2e8f0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(90vh - 140px);
+            overflow-y: auto;
+        }
+
+        .document-viewer {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 992px) {
+            .document-viewer {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .document-preview {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .document-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .document-details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .verification-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="dashboard.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+                
+                <div class="nav-icons">
+                    <div class="user-profile" id="userProfile">
+                        A
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Document Verification</h1>
+                <p>Review and verify user-submitted KYC documents for identity verification.</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-label">Pending Verification</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon verified">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="verifiedCount">0</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon rejected">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value" id="rejectedCount">0</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="verified">Verified</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Document Type</label>
+                    <select class="filter-select" id="documentTypeFilter">
+                        <option value="all">All Types</option>
+                        <option value="National ID Card">National ID Card</option>
+                        <option value="Passport">Passport</option>
+                        <option value="Driver's License">Driver's License</option>
+                    </select>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                
+                <button class="btn btn-primary" id="exportBtn">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+
+            <!-- Verification Table -->
+            <div class="verification-table-container">
+                <div class="table-header">
+                    <h2>KYC Submissions</h2>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="verification-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Document Type</th>
+                                <th>Submitted Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verificationTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <div class="pagination-info" id="paginationInfo">
+                        Showing 0 of 0 entries
+                    </div>
+                    <div class="pagination-controls" id="paginationControls">
+                        <!-- Pagination buttons will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Document Viewer Modal -->
+    <div class="modal" id="documentViewerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Document Verification</h2>
+                <button class="modal-close" id="documentViewerModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="document-viewer">
+                    <div class="document-preview" id="documentPreview">
+                        <!-- Document preview will be loaded here -->
+                    </div>
+                    
+                    <div class="document-details">
+                        <div class="detail-group">
+                            <div class="detail-label">User Information</div>
+                            <div class="detail-value" id="userInfo">-</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <div class="detail-label">Document Type</div>
+                            <div class="detail-value" id="documentType">-</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <div class="detail-label">Submitted Date</div>
+                            <div class="detail-value" id="submittedDate">-</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <div class="detail-label">Current Status</div>
+                            <div class="detail-value">
+                                <span class="status-badge" id="currentStatus">Pending</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <div class="detail-label">Document Details</div>
+                            <div class="detail-value" id="documentDetails">-</div>
+                        </div>
+                        
+                        <div class="verification-form" id="verificationForm">
+                            <h3>Verification Decision</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Decision</label>
+                                <select class="form-control" id="verificationDecision">
+                                    <option value="">Select Decision</option>
+                                    <option value="verified">Approve & Verify</option>
+                                    <option value="rejected">Reject</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="rejectionReasonGroup" style="display: none;">
+                                <label class="form-label">Reason for Rejection</label>
+                                <textarea class="form-control" id="rejectionReason" placeholder="Please provide a clear reason for rejection..."></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button class="btn btn-secondary" id="cancelVerificationBtn">Cancel</button>
+                                <button class="btn btn-success" id="submitVerificationBtn" disabled>Submit Decision</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://jsduxuhgvzebkleftabo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzZHV4dWhndnplYmtsZWZ0YWJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg0NTc3NTYsImV4cCI6MjA3NDAzMzc1Nn0.acYVWNKxykolOntNeEd0aC3638UmE-y3ZtyDEN_4MFI';
+
+        // Initialize Supabase client
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let totalItems = 0;
+        let currentFilter = {
+            status: 'all',
+            documentType: 'all',
+            search: ''
+        };
+        let currentVerificationId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVerificationSystem();
+        });
+
+        async function initializeVerificationSystem() {
+            // Check if user is admin
+            await checkAdminAccess();
+            
+            // Load verification data
+            await loadVerificationData();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        async function checkAdminAccess() {
+            const user = JSON.parse(localStorage.getItem('delevva_user'));
+            
+            if (!user || !user.isLoggedIn) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // In a real system, you would check if the user has admin privileges
+            // For this demo, we'll assume the user is an admin
+            document.getElementById('userProfile').textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        async function loadVerificationData() {
+            showLoadingState();
+            
+            try {
+                // Build query based on filters
+                let query = supabaseClient
+                    .from('kyc_verifications')
+                    .select(`
+                        *,
+                        profiles:user_id (
+                            full_name,
+                            email,
+                            phone
+                        )
+                    `, { count: 'exact' });
+                
+                // Apply filters
+                if (currentFilter.status !== 'all') {
+                    query = query.eq('status', currentFilter.status);
+                }
+                
+                if (currentFilter.documentType !== 'all') {
+                    query = query.eq('document_type', currentFilter.documentType);
+                }
+                
+                if (currentFilter.search) {
+                    query = query.or(`profiles.full_name.ilike.%${currentFilter.search}%,profiles.email.ilike.%${currentFilter.search}%`);
+                }
+                
+                // Apply pagination
+                const from = (currentPage - 1) * itemsPerPage;
+                const to = from + itemsPerPage - 1;
+                
+                const { data, error, count } = await query
+                    .order('submitted_at', { ascending: false })
+                    .range(from, to);
+                
+                if (error) throw error;
+                
+                totalItems = count;
+                displayVerificationData(data || []);
+                updateStats(data || []);
+                updatePagination();
+                
+            } catch (error) {
+                console.error('Error loading verification data:', error);
+                showNotification('Error loading verification data', 'error');
+                showEmptyState();
+            }
+        }
+
+        function displayVerificationData(verifications) {
+            const tableBody = document.getElementById('verificationTableBody');
+            
+            if (verifications.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            tableBody.innerHTML = verifications.map(verification => `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                ${verification.profiles?.full_name?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">${verification.profiles?.full_name || 'Unknown User'}</div>
+                                <div class="user-email">${verification.profiles?.email || 'No email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="document-info">
+                            <div class="document-type">${verification.document_type || 'Unknown'}</div>
+                            <div class="document-date">${formatDate(verification.submitted_at)}</div>
+                        </div>
+                    </td>
+                    <td>${formatDate(verification.submitted_at)}</td>
+                    <td>
+                        <span class="status-badge ${verification.status}">
+                            <i class="fas fa-${getStatusIcon(verification.status)}"></i>
+                            ${verification.status.charAt(0).toUpperCase() + verification.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn view" data-id="${verification.id}" title="View Document">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${verification.status === 'pending' ? `
+                                <button class="action-btn approve" data-id="${verification.id}" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="action-btn reject" data-id="${verification.id}" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.action-btn.view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const verificationId = this.getAttribute('data-id');
+                    viewDocument(verificationId);
+                });
+            });
+            
+            document.querySelectorAll('.action-btn.approve').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const verificationId = this.getAttribute('data-id');
+                    approveDocument(verificationId);
+                });
+            });
+            
+            document.querySelectorAll('.action-btn.reject').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const verificationId = this.getAttribute('data-id');
+                    rejectDocument(verificationId);
+                });
+            });
+        }
+
+        function showLoadingState() {
+            const tableBody = document.getElementById('verificationTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Loading verification data...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function showEmptyState() {
+            const tableBody = document.getElementById('verificationTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="fas fa-file-search"></i>
+                            <h3>No KYC submissions found</h3>
+                            <p>There are currently no KYC submissions matching your criteria.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function updateStats(verifications) {
+            const pendingCount = verifications.filter(v => v.status === 'pending').length;
+            const verifiedCount = verifications.filter(v => v.status === 'verified').length;
+            const rejectedCount = verifications.filter(v => v.status === 'rejected').length;
+            const totalCount = verifications.length;
+            
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('verifiedCount').textContent = verifiedCount;
+            document.getElementById('rejectedCount').textContent = rejectedCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationInfo = document.getElementById('paginationInfo');
+            const paginationControls = document.getElementById('paginationControls');
+            
+            // Update pagination info
+            const from = (currentPage - 1) * itemsPerPage + 1;
+            const to = Math.min(currentPage * itemsPerPage, totalItems);
+            paginationInfo.textContent = `Showing ${from} to ${to} of ${totalItems} entries`;
+            
+            // Generate pagination buttons
+            let paginationHTML = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button class="pagination-btn" data-page="${currentPage - 1}"><i class="fas fa-chevron-left"></i></button>`;
+            } else {
+                paginationHTML += `<button class="pagination-btn disabled"><i class="fas fa-chevron-left"></i></button>`;
+            }
+            
+            // Page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    paginationHTML += `<button class="pagination-btn active">${i}</button>`;
+                } else {
+                    paginationHTML += `<button class="pagination-btn" data-page="${i}">${i}</button>`;
+                }
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="pagination-btn" data-page="${currentPage + 1}"><i class="fas fa-chevron-right"></i></button>`;
+            } else {
+                paginationHTML += `<button class="pagination-btn disabled"><i class="fas fa-chevron-right"></i></button>`;
+            }
+            
+            paginationControls.innerHTML = paginationHTML;
+            
+            // Add event listeners to pagination buttons
+            document.querySelectorAll('.pagination-btn:not(.disabled)').forEach(btn => {
+                if (!btn.classList.contains('active')) {
+                    btn.addEventListener('click', function() {
+                        const page = parseInt(this.getAttribute('data-page'));
+                        if (page) {
+                            currentPage = page;
+                            loadVerificationData();
+                        }
+                    });
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Filter event listeners
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                currentFilter.status = this.value;
+                currentPage = 1;
+                loadVerificationData();
+            });
+            
+            document.getElementById('documentTypeFilter').addEventListener('change', function() {
+                currentFilter.documentType = this.value;
+                currentPage = 1;
+                loadVerificationData();
+            });
+            
+            document.getElementById('searchInput').addEventListener('input', debounce(function() {
+                currentFilter.search = this.value;
+                currentPage = 1;
+                loadVerificationData();
+            }, 500));
+            
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                loadVerificationData();
+            });
+            
+            // Export button
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                exportData();
+            });
+            
+            // Document viewer modal
+            const documentViewerModal = document.getElementById('documentViewerModal');
+            const documentViewerModalClose = document.getElementById('documentViewerModalClose');
+            
+            documentViewerModalClose.addEventListener('click', function() {
+                documentViewerModal.classList.remove('active');
+            });
+            
+            // Verification decision
+            document.getElementById('verificationDecision').addEventListener('change', function() {
+                const decision = this.value;
+                const rejectionReasonGroup = document.getElementById('rejectionReasonGroup');
+                const submitVerificationBtn = document.getElementById('submitVerificationBtn');
+                
+                if (decision === 'rejected') {
+                    rejectionReasonGroup.style.display = 'block';
+                    submitVerificationBtn.disabled = false;
+                } else if (decision === 'verified') {
+                    rejectionReasonGroup.style.display = 'none';
+                    submitVerificationBtn.disabled = false;
+                } else {
+                    rejectionReasonGroup.style.display = 'none';
+                    submitVerificationBtn.disabled = true;
+                }
+            });
+            
+            // Cancel verification
+            document.getElementById('cancelVerificationBtn').addEventListener('click', function() {
+                documentViewerModal.classList.remove('active');
+                resetVerificationForm();
+            });
+            
+            // Submit verification
+            document.getElementById('submitVerificationBtn').addEventListener('click', function() {
+                submitVerificationDecision();
+            });
+        }
+
+        async function viewDocument(verificationId) {
+            try {
+                // Get verification details
+                const { data: verification, error } = await supabaseClient
+                    .from('kyc_verifications')
+                    .select(`
+                        *,
+                        profiles:user_id (
+                            full_name,
+                            email,
+                            phone
+                        )
+                    `)
+                    .eq('id', verificationId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Populate modal with verification data
+                document.getElementById('userInfo').textContent = 
+                    `${verification.profiles?.full_name || 'Unknown User'} (${verification.profiles?.email || 'No email'})`;
+                
+                document.getElementById('documentType').textContent = verification.document_type || 'Unknown';
+                document.getElementById('submittedDate').textContent = formatDate(verification.submitted_at);
+                document.getElementById('documentDetails').textContent = 
+                    `File: ${verification.file_name || 'Unknown'} (${formatFileSize(verification.file_size || 0)})`;
+                
+                // Update status badge
+                const currentStatus = document.getElementById('currentStatus');
+                currentStatus.textContent = verification.status.charAt(0).toUpperCase() + verification.status.slice(1);
+                currentStatus.className = `status-badge ${verification.status}`;
+                
+                // Load document preview
+                const documentPreview = document.getElementById('documentPreview');
+                if (verification.id_document_url) {
+                    documentPreview.innerHTML = `<img src="${verification.id_document_url}" alt="ID Document">`;
+                } else {
+                    documentPreview.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-file-image" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>Document not available</p>
+                        </div>
+                    `;
+                }
+                
+                // Show or hide verification form based on status
+                const verificationForm = document.getElementById('verificationForm');
+                if (verification.status === 'pending') {
+                    verificationForm.style.display = 'block';
+                    currentVerificationId = verificationId;
+                } else {
+                    verificationForm.style.display = 'none';
+                    currentVerificationId = null;
+                }
+                
+                // Show modal
+                const documentViewerModal = document.getElementById('documentViewerModal');
+                documentViewerModal.classList.add('active');
+                
+            } catch (error) {
+                console.error('Error loading document:', error);
+                showNotification('Error loading document', 'error');
+            }
+        }
+
+        async function approveDocument(verificationId) {
+            if (confirm('Are you sure you want to approve this document? The user will be verified and gain full access to Delevva features.')) {
+                try {
+                    // Update verification status
+                    const { error } = await supabaseClient
+                        .from('kyc_verifications')
+                        .update({ 
+                            status: 'verified',
+                            verified_at: new Date().toISOString(),
+                            verified_by: 'Admin', // In a real system, use actual admin ID
+                            rejection_reason: null,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', verificationId);
+                    
+                    if (error) throw error;
+                    
+                    // Update user profile to mark as verified
+                    const { data: verification } = await supabaseClient
+                        .from('kyc_verifications')
+                        .select('user_id')
+                        .eq('id', verificationId)
+                        .single();
+                    
+                    if (verification) {
+                        await supabaseClient
+                            .from('profiles')
+                            .update({ 
+                                kyc_verified: true,
+                                kyc_verified_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', verification.user_id);
+                        
+                        // Award 15 DP to user for completing KYC
+                        await awardKycPoints(verification.user_id);
+                    }
+                    
+                    showNotification('Document approved successfully! User has been verified.', 'success');
+                    
+                    // Reload data
+                    loadVerificationData();
+                    
+                    // Close modal if open
+                    document.getElementById('documentViewerModal').classList.remove('active');
+                    
+                } catch (error) {
+                    console.error('Error approving document:', error);
+                    showNotification('Error approving document', 'error');
+                }
+            }
+        }
+
+        async function rejectDocument(verificationId) {
+            const reason = prompt('Please provide a reason for rejection:');
+            
+            if (reason && reason.trim()) {
+                try {
+                    // Update verification status
+                    const { error } = await supabaseClient
+                        .from('kyc_verifications')
+                        .update({ 
+                            status: 'rejected',
+                            rejection_reason: reason.trim(),
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', verificationId);
+                    
+                    if (error) throw error;
+                    
+                    showNotification('Document rejected successfully.', 'success');
+                    
+                    // Reload data
+                    loadVerificationData();
+                    
+                    // Close modal if open
+                    document.getElementById('documentViewerModal').classList.remove('active');
+                    
+                } catch (error) {
+                    console.error('Error rejecting document:', error);
+                    showNotification('Error rejecting document', 'error');
+                }
+            }
+        }
+
+        async function submitVerificationDecision() {
+            const decision = document.getElementById('verificationDecision').value;
+            const rejectionReason = document.getElementById('rejectionReason').value;
+            
+            if (!decision) {
+                showNotification('Please select a decision', 'error');
+                return;
+            }
+            
+            if (decision === 'rejected' && !rejectionReason.trim()) {
+                showNotification('Please provide a reason for rejection', 'error');
+                return;
+            }
+            
+            if (!currentVerificationId) {
+                showNotification('No verification selected', 'error');
+                return;
+            }
+            
+            try {
+                // Update verification status
+                const updateData = {
+                    status: decision,
+                    updated_at: new Date().toISOString()
+                };
+                
+                if (decision === 'verified') {
+                    updateData.verified_at = new Date().toISOString();
+                    updateData.verified_by = 'Admin'; // In a real system, use actual admin ID
+                    updateData.rejection_reason = null;
+                } else if (decision === 'rejected') {
+                    updateData.rejection_reason = rejectionReason.trim();
+                }
+                
+                const { error } = await supabaseClient
+                    .from('kyc_verifications')
+                    .update(updateData)
+                    .eq('id', currentVerificationId);
+                
+                if (error) throw error;
+                
+                // If verified, update user profile and award points
+                if (decision === 'verified') {
+                    const { data: verification } = await supabaseClient
+                        .from('kyc_verifications')
+                        .select('user_id')
+                        .eq('id', currentVerificationId)
+                        .single();
+                    
+                    if (verification) {
+                        await supabaseClient
+                            .from('profiles')
+                            .update({ 
+                                kyc_verified: true,
+                                kyc_verified_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', verification.user_id);
+                        
+                        // Award 15 DP to user for completing KYC
+                        await awardKycPoints(verification.user_id);
+                    }
+                }
+                
+                showNotification(`Document ${decision} successfully!`, 'success');
+                
+                // Reload data
+                loadVerificationData();
+                
+                // Close modal
+                document.getElementById('documentViewerModal').classList.remove('active');
+                resetVerificationForm();
+                
+            } catch (error) {
+                console.error('Error submitting verification decision:', error);
+                showNotification('Error submitting decision', 'error');
+            }
+        }
+
+        async function awardKycPoints(userId) {
+            try {
+                // Get current profile
+                const { data: profile, error } = await supabaseClient
+                    .from('profiles')
+                    .select('delevva_points')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Update DP balance with +15 DP
+                await supabaseClient
+                    .from('profiles')
+                    .update({ 
+                        delevva_points: (profile.delevva_points || 0) + 15,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', userId);
+                
+            } catch (error) {
+                console.error('Error awarding KYC points:', error);
+            }
+        }
+
+        function resetVerificationForm() {
+            document.getElementById('verificationDecision').value = '';
+            document.getElementById('rejectionReason').value = '';
+            document.getElementById('rejectionReasonGroup').style.display = 'none';
+            document.getElementById('submitVerificationBtn').disabled = true;
+            currentVerificationId = null;
+        }
+
+        function exportData() {
+            // In a real implementation, this would generate a CSV or Excel file
+            showNotification('Export feature coming soon!', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'pending': return 'clock';
+                case 'verified': return 'check-circle';
+                case 'rejected': return 'times-circle';
+                default: return 'question-circle';
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delevva | Payment Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --primary-dark: #FF7F00;
+            --primary-light: #FFA500;
+            --secondary: #10B981;
+            --accent: #FF8C00;
+            --accent-dark: #FF7F00;
+            --accent-light: #FFA500;
+            --dark: #1A1A1A;
+            --light: #F8FAFC;
+            --gray: #64748B;
+            --danger: #EE5A52;
+            --success: #10B981;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --sky-blue: #E0F2FE;
+            --dark-bg: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #F0FDF4 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--dark);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 0 50px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-header::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 30px;
+        }
+
+        .payment-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .payment-subtitle {
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .payment-body {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        }
+
+        .payment-info {
+            background: #f8f8f8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .payment-info-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .payment-info-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-top: 15px;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .payment-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .payment-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #eee;
+            z-index: 1;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .step.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .step.completed {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 20px;
+        }
+
+        .success-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .success-text {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--dark-bg);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #b2b2b2;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b2b2b2;
+            font-size: 14px;
+        }
+
+        /* Stylish Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .popup {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .popup-overlay.active .popup {
+            transform: translateY(0);
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .popup-header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .popup-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .popup-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-subtitle {
+            opacity: 0.9;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .popup-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .popup-message {
+            color: var(--dark);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .popup-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .popup-btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .popup-btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+        }
+
+        .popup-btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .popup-btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .popup-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes successCheckmark {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-checkmark {
+            animation: successCheckmark 0.6s ease forwards;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-title {
+                font-size: 1.6rem;
+            }
+            
+            .popup-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .payment-header {
+                padding: 30px 20px;
+            }
+            
+            .payment-body {
+                padding: 30px 20px;
+            }
+            
+            .popup {
+                max-width: 100%;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="home.html" class="logo">
+                    <div class="logo-icon">D</div>
+                    <div class="logo-text">DELE<span>VVA</span></div>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="payment-container">
+                <div class="payment-header">
+                    <div class="payment-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h1 class="payment-title">Payment Confirmation</h1>
+                    <p class="payment-subtitle">Enter your confirmation code to complete your order</p>
+                </div>
+                
+                <div class="payment-body">
+                    <div class="payment-steps">
+                        <div class="step completed">
+                            1
+                            <span class="step-label">Payment</span>
+                        </div>
+                        <div class="step active">
+                            2
+                            <span class="step-label">Confirmation</span>
+                        </div>
+                        <div class="step">
+                            3
+                            <span class="step-label">Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-info">
+                        <div class="payment-info-title">Important Information</div>
+                        <p class="payment-info-text">After making your payment via USSD, our agent will provide you with a confirmation code.</p>
+                        <p class="payment-info-text">Enter that code below to verify your payment and complete your order.</p>
+                    </div>
+                    
+                    <form id="confirmationForm">
+                        <div class="form-group">
+                            <label for="confirmationCode" class="form-label">Confirmation Code</label>
+                            <input type="text" id="confirmationCode" class="form-control" placeholder="Enter the code provided by our agent" required>
+                        </div>
+                        
+                        
+                        <button type="submit" class="btn btn-primary" id="confirmPaymentBtn">
+                            <span>Confirm Payment</span>
+                        </button>
+                        
+                        <button type="button" class="btn btn-outline" id="needHelpBtn">
+                            <i class="fas fa-question-circle"></i> Need Help?
+                        </button>
+                    </form>
+                    
+                    <div class="success-message" id="successMessage" style="display: none;">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="success-title">Payment Confirmed!</h2>
+                        <p class="success-text">Your payment has been successfully verified. Your order is now being processed.</p>
+                        <button class="btn btn-primary" id="goToDashboardBtn">Go to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>DELEVVA</h3>
+                    <p style="color: #b2b2b2; font-size: 14px; margin-bottom: 20px;">Delivering happiness to your doorstep with fast, reliable, and secure delivery services.</p>
+                    <div class="social-links" style="display: flex; gap: 15px;">
+                        <a href="#" style="color: #b2b2b2; font-size: 18px;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: #b2b2b2; font-size: 18px;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: #b2b2b2; font-size: 18px;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: #b2b2b2; font-size: 18px;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="home.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="vip.html">VIP</a></li>
+                        <li><a href="support.html">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Delivery St, City, State 12345</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> support@delevva.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 DELEVVA. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Stylish Popup -->
+    <div class="popup-overlay" id="helpPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <button class="popup-close" id="closeHelpPopup">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="popup-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h2 class="popup-title">Need Help?</h2>
+                <p class="popup-subtitle">We're here to assist you</p>
+            </div>
+            <div class="popup-body">
+                <p class="popup-message">
+                    If you need help with your payment confirmation, please contact our support team:
+                </p>
+                <div style="text-align: left; background: #f8f8f8; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="margin-bottom: 8px;"><i class="fas fa-envelope" style="color: var(--primary); margin-right: 10px;"></i> support@delevva.com</p>
+                    <p style="margin-bottom: 8px;"><i class="fas fa-phone" style="color: var(--primary); margin-right: 10px;"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-clock" style="color: var(--primary); margin-right: 10px;"></i> Available 24/7</p>
+                </div>
+                <div class="popup-actions">
+                    <button class="popup-btn popup-btn-primary" id="copyEmailBtn">
+                        <i class="fas fa-copy"></i> Copy Email
+                    </button>
+                    <button class="popup-btn popup-btn-outline" id="closeHelpBtn">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmationForm = document.getElementById('confirmationForm');
+            const successMessage = document.getElementById('successMessage');
+            const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+            const needHelpBtn = document.getElementById('needHelpBtn');
+            const goToDashboardBtn = document.getElementById('goToDashboardBtn');
+            const helpPopup = document.getElementById('helpPopup');
+            const closeHelpPopup = document.getElementById('closeHelpPopup');
+            const closeHelpBtn = document.getElementById('closeHelpBtn');
+            const copyEmailBtn = document.getElementById('copyEmailBtn');
+            
+            // Form submission
+            confirmationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const confirmationCode = document.getElementById('confirmationCode').value;
+                
+                if (!confirmationCode) {
+                    showErrorPopup('Please enter your confirmation code');
+                    return;
+                }
+                
+                // Show loading state
+                confirmPaymentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+                confirmPaymentBtn.disabled = true;
+                
+                // Simulate API call to verify payment
+                setTimeout(function() {
+                    // Show success message
+                    confirmationForm.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    // Update steps
+                    document.querySelectorAll('.step')[2].classList.add('completed');
+                }, 2000);
+            });
+            
+            // Help button click
+            needHelpBtn.addEventListener('click', function() {
+                helpPopup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // Close help popup
+            closeHelpPopup.addEventListener('click', function() {
+                helpPopup.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            closeHelpBtn.addEventListener('click', function() {
+                helpPopup.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Copy email to clipboard
+            copyEmailBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText('support@delevva.com').then(function() {
+                    const originalText = copyEmailBtn.innerHTML;
+                    copyEmailBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyEmailBtn.style.background = 'var(--success)';
+                    
+                    setTimeout(function() {
+                        copyEmailBtn.innerHTML = originalText;
+                        copyEmailBtn.style.background = '';
+                    }, 2000);
+                });
+            });
+            
+            // Go to dashboard
+            goToDashboardBtn.addEventListener('click', function() {
+                window.location.href = 'dashboard.html';
+            });
+            
+            // Close popup when clicking outside
+            helpPopup.addEventListener('click', function(e) {
+                if (e.target === helpPopup) {
+                    helpPopup.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // Function to show error popup
+            function showErrorPopup(message) {
+                // Create error popup on the fly
+                const errorPopup = document.createElement('div');
+                errorPopup.className = 'popup-overlay active';
+                errorPopup.innerHTML = `
+                    <div class="popup">
+                        <div class="popup-header" style="background: linear-gradient(135deg, var(--danger) 0%, #FF6B6B 100%);">
+                            <div class="popup-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h2 class="popup-title">Attention Required</h2>
+                            <p class="popup-subtitle">Please check your input</p>
+                        </div>
+                        <div class="popup-body">
+                            <p class="popup-message">${message}</p>
+                            <div class="popup-actions">
+                                <button class="popup-btn popup-btn-primary" id="closeErrorBtn" style="background: var(--danger);">
+                                    OK, I Understand
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(errorPopup);
+                
+                // Close error popup
+                const closeErrorBtn = errorPopup.querySelector('#closeErrorBtn');
+                closeErrorBtn.addEventListener('click', function() {
+                    document.body.removeChild(errorPopup);
+                    document.body.style.overflow = 'auto';
+                });
+                
+                // Close when clicking outside
+                errorPopup.addEventListener('click', function(e) {
+                    if (e.target === errorPopup) {
+                        document.body.removeChild(errorPopup);
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+                
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    </script>
+</body>
+</html>
